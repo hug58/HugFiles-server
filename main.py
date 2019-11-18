@@ -6,8 +6,10 @@ from flask_restful import Resource, Api
 
 import os
 
+if not os.path.isdir('files'):
+	os.makedirs('files',exist_ok=True)
 
-UPLOAD_FOLDER = './files'
+UPLOAD_FOLDER = 'files'
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -15,9 +17,16 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 api = Api(app)
 
 class ListFiles(Resource):
+	 
+	_list_files = {}
 
 	def get(self):
-		return jsonify('No hay lista')
+		for route,dirs,files in os.walk(UPLOAD_FOLDER,topdown=True):
+			self._list_files[route] = files
+
+		return self._list_files
+
+
 
 
 class File(Resource):
@@ -29,7 +38,6 @@ class File(Resource):
 		'''
 		Creando la carpeta sino existe
 		'''
-
 		if not os.path.isdir(_route):
 			os.makedirs(route,exist_ok=True)
 
@@ -42,7 +50,7 @@ class File(Resource):
 
 	def get(self,route,filename):
 		
-		_route = os.path.join(UPLOAD_FOLDER,route + '/' + filename)
+		_route = os.path.join(UPLOAD_FOLDER,route + os.sep + filename)
 
 		if os.path.isfile(_route):
 			return send_from_directory(
@@ -56,12 +64,10 @@ class File(Resource):
 
 api.add_resource(ListFiles,
 				'/',
-				'/files/list',
 				)
 
 
 api.add_resource(File,
-				'/upload/<filename>',
 				'/files/<path:route>/<filename>',
 				)
 
