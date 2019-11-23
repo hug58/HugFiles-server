@@ -7,6 +7,9 @@ from werkzeug.datastructures import FileStorage
 from flask_restful import Resource, Api 
 
 import os
+import os.path
+import time 
+
 from pathlib import Path
 
 
@@ -29,17 +32,57 @@ class ListFiles(Resource):
 
 	def get(self):
 		for route,dirs,files in os.walk(os.path.join(UPLOAD_FOLDER,'files/') ,topdown=True):
-			self._list_files[route] = files
+			
+			_files = {}
+
+			for file in files:
+				
+				filename = route + '/' +  file
+				_file = {
+					'Acces time': time.ctime(os.path.getatime(filename)),
+					'Modified time': time.ctime(os.path.getmtime(filename)),
+					'Change time': time.ctime(os.path.getctime(filename)),
+					'Size': os.path.getsize(filename),
+				}
+
+				_files[file] = _file
+
+
+			self._list_files[route] = _files
+
 
 		return self._list_files
 
 
 
-
 class File(Resource):
+
+	def delete(self,route):
+		_route = os.path.join(UPLOAD_FOLDER,route)
+		if os.path.exists(_route):
+			os.remove(_route)
+			return 200
+
+		else:
+			return 404
+
+
+
+	def put(self,route):
+		_route = os.path.join(UPLOAD_FOLDER,route)
+		file = request.files['upload_file']
+		path = Path(os.path.join(_route,file.filename) )
+
+		if os.path.exists(path):
+			file = request.files['upload_file']
+			file.save(os.path.join(_route,file.filename))
+
+			return 200
+		
+		else:
+			return 404
 	
 	def post(self,route):
-
 		_route = os.path.join(UPLOAD_FOLDER,route)
 
 		
@@ -50,7 +93,8 @@ class File(Resource):
 			os.makedirs(_route,exist_ok=True)
 
 		file = request.files['upload_file']
-		file.save(os.path.join(_route,file.filename))
+		filename = secure_filename(os.path.join(_route,file.filename))
+		file.save(os.path.join(_route,filename))
 		
 
 		return jsonify(f"archivo {file.filename} subido correctamente!")
@@ -75,18 +119,21 @@ class File(Resource):
 				
 			except:
 				
-				return jsonify('No enviado.')
+				return 404
 
 		
 		else:
 			return jsonify(f'Archivo no encontrado. {_route}',404)
 
 
-"""
+
+
+
+
 api.add_resource(ListFiles,
 				'/',
 				)
-"""
+
 
 api.add_resource(File,
 				'/data/<path:route>',
