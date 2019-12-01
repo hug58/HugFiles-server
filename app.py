@@ -14,7 +14,7 @@ from pathlib import Path
 
 
 if not os.path.isdir('data'):
-	os.makedirs('data',exist_ok=True)
+	os.makedirs('data/files',exist_ok=True)
 
 UPLOAD_FOLDER = './data'
 
@@ -25,7 +25,7 @@ api = Api(app)
 
 class ListFiles(Resource):
 	 
-	_list_files = {}
+	_list_files = []
 
 	def post(self):
 		pass
@@ -33,25 +33,28 @@ class ListFiles(Resource):
 	def get(self):
 		for route,dirs,files in os.walk(os.path.join(UPLOAD_FOLDER,'files/') ,topdown=True):
 			
-			_files = {}
+			#_files = {}
 
 			for file in files:
 				
 				filename = route + '/' +  file
 				_file = {
+					'Name': file,
+					'Path': route,
 					'Acces time': time.ctime(os.path.getatime(filename)),
 					'Modified time': time.ctime(os.path.getmtime(filename)),
 					'Change time': time.ctime(os.path.getctime(filename)),
 					'Size': os.path.getsize(filename),
 				}
 
-				_files[file] = _file
+				#_files[file] = _file
+				self._list_files.append(_file)
+
+			#self._list_files[route] = _files
+			#self._list_files.append(_files)
 
 
-			self._list_files[route] = _files
-
-
-		return self._list_files
+		return jsonify(self._list_files)
 
 
 
@@ -124,8 +127,6 @@ class File(Resource):
 		
 		else:
 			return jsonify(f'Archivo no encontrado. {_route}',404)
-
-
 
 
 
