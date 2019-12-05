@@ -16,7 +16,7 @@ from pathlib import Path
 if not os.path.isdir('data'):
 	os.makedirs('data/files',exist_ok=True)
 
-UPLOAD_FOLDER = './data'
+UPLOAD_FOLDER = 'data'
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -25,15 +25,18 @@ api = Api(app)
 
 class ListFiles(Resource):
 	 
-	_list_files = []
 
 	def post(self):
 		pass
 
 	def get(self):
+
+		self._list_files = []
+
+
 		for route,dirs,files in os.walk(os.path.join(UPLOAD_FOLDER,'files/') ,topdown=True):
 			
-			#_files = {}
+			route = route.replace('\\','/')
 
 			for file in files:
 				
