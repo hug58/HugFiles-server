@@ -50,12 +50,7 @@ class ListFiles(Resource):
 					'Size': os.path.getsize(filename),
 				}
 
-				#_files[file] = _file
 				self._list_files.append(_file)
-
-			#self._list_files[route] = _files
-			#self._list_files.append(_files)
-
 
 		return jsonify(self._list_files)
 
@@ -121,12 +116,10 @@ class File(Resource):
 					path.parent,
 					path.name,
 					)
-
 				
 			except:
 				
 				return 404
-
 		
 		else:
 			return jsonify(f'Archivo no encontrado. {_route}',404)
