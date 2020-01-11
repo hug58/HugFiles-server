@@ -1,8 +1,7 @@
 
 
 import os
-import time 
-
+ 
 def list_files(path):
 	_list_files = []
 
@@ -13,9 +12,9 @@ def list_files(path):
 			_file = {
 				'Name': file,
 				'Path': route,
-				'Acces time': time.ctime(os.path.getatime(filename)),
-				'Modified time': time.ctime(os.path.getmtime(filename)),
-				'Change time': time.ctime(os.path.getctime(filename)),
+				'Acces time': os.path.getatime(filename),
+				'Modified time': os.path.getmtime(filename),
+				'Change time': os.path.getctime(filename),
 				'Size': os.path.getsize(filename),
 			}
 			_list_files.append(_file)

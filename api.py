@@ -34,44 +34,47 @@ class File(Resource):
 
 	def delete(self,route):
 		_route = os.path.join(UPLOAD_FOLDER,route)
-		path = Path(_route)
-		if os.path.exists(path):
+
+		if os.path.exists(_route):
 			os.remove(_route)
 			return 200
 
 		else:
-			return 404
+			return 400
 
 	def put(self,route):
+
 		_route = os.path.join(UPLOAD_FOLDER,route)
-		file = request.files['upload_file']
+		
 		path = Path(_route) 
 
 
-		if os.path.exists(_route):
+		if os.path.exists(path):
 
-			if os.path.isfile(_route):
+			if os.path.isfile(path):
 
-				if path.name == file.filename:
-					file.save(_route)
+				if request.json:
+					data = json.loads(request.get_json())   
+
+					if data and 'New name' in data:
+						new_file = str(path.parent).replace('\\','/') + '/' + data['New name']
+						os.rename(_route,new_file)
+						return 200
 
 				else:
+					file = request.files['upload_file']
+					file.save(_route)
+					return 200
 
 
-					'''
-					Reemplazar y cambiar el nombre del archivo
-					'''
-					os.rename(_route,path.parent + '/' + filename)
-					pass
 
 			else:
 				'''
 				Es una carpeta
 				'''
 
-				pass
+				return 202
 
-			return 200
 		
 		else:
 			return 404

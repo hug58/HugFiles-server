@@ -51,9 +51,11 @@ async def main(websocket,path):
 		await unregister(websocket)
 
 
-start_server = websockets.serve(main,"localhost",7000)
 
+if __name__ == '__main__':
 
-asyncio.get_event_loop().run_until_complete(start_server)
-asyncio.get_event_loop().run_forever()
+	start_server = websockets.serve(main,"localhost",7000)
+
+	asyncio.get_event_loop().run_until_complete(start_server)
+	asyncio.get_event_loop().run_forever()
 
