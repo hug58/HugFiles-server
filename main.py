@@ -11,7 +11,7 @@ import requests
 USERS = set()
 
 
-API = 'http://127.0.0.1:5000/api'
+API = 'http://127.0.0.1:5000/list/files'
 
 async def register(websocket):
 	USERS.add(websocket)
@@ -19,12 +19,14 @@ async def register(websocket):
 async def unregister(websocket):
 	USERS.remove(websocket)
 
-async def notify_state(msg,websocket):
-	
-	print(msg)
+async def notitfy_state(message):
+	if USERS:
 
-	if USERS: # USERS != 0
-		await asyncio.wait([ user.send(msg) for user in USERS]) #if websocket != user 
+		_message = json.loads(message)
+		print(f"Message: {_message}")
+
+		await asyncio.wait([ user.send(message) for user in USERS ]) #if user != websocket
+
 
 
 async def main(websocket,path):
@@ -44,8 +46,14 @@ async def main(websocket,path):
 	data = data.json()
 
 	try:
+
+
 		for file in data:
-			await websocket.send( json.dumps(file))
+			await websocket.send( json.dumps(file) )
+
+		async for message in websocket:
+			await notitfy_state(message)
+
 
 	finally:
 		await unregister(websocket)
@@ -59,3 +67,4 @@ if __name__ == '__main__':
 	asyncio.get_event_loop().run_until_complete(start_server)
 	asyncio.get_event_loop().run_forever()
 
+	print(__name__)

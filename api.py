@@ -12,7 +12,7 @@ import json
 
 
 #Locals
-from utils import list_files
+from utils import _files
 
 
 if not os.path.isdir('data'):
@@ -27,8 +27,9 @@ api = Api(app)
 
 class ListFiles(Resource):
 	 
-	def get(self):
-		return jsonify(list_files('data/files'))
+	def get(self,route):
+		route = os.path.join(UPLOAD_FOLDER,route)
+		return jsonify(_files(route))
 
 class File(Resource):
 
@@ -56,8 +57,8 @@ class File(Resource):
 				if request.json:
 					data = json.loads(request.get_json())   
 
-					if data and 'New name' in data:
-						new_file = str(path.parent).replace('\\','/') + '/' + data['New name']
+					if data and 'new name' in data:
+						new_file = str(path.parent).replace('\\','/') + '/' + data['new name']
 						os.rename(_route,new_file)
 						return 200
 
@@ -86,7 +87,6 @@ class File(Resource):
 		'''
 		Creando la carpeta sino existe
 		'''
-		print(_route)
 
 		
 		if not os.path.isdir(_route):
@@ -97,8 +97,7 @@ class File(Resource):
 			
 			file = request.files['upload_file']
 			file.save(os.path.join(_route,file.filename))
-			print("OK")
-			return 202
+			return 200
 
 		except:
 
@@ -123,11 +122,13 @@ class File(Resource):
 			return jsonify(f'file no found. {path.name}',404)
 
 
+
+
 api.add_resource(ListFiles,
-				'/api',
+				'/list/<path:route>',
 				)
 api.add_resource(File,
-				'/api/data/<path:route>',
+				'/data/<path:route>',
 				)
 
 
