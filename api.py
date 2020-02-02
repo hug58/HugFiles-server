@@ -29,7 +29,12 @@ class ListFiles(Resource):
 	 
 	def get(self,route):
 		route = os.path.join(UPLOAD_FOLDER,route)
-		return jsonify(_files(route))
+		data = _files(route)
+		
+		if os.path.exists(route):
+			return data,200
+		else:
+			return {'File no found ': route },404
 
 class File(Resource):
 
@@ -41,7 +46,8 @@ class File(Resource):
 			return 200
 
 		else:
-			return 400
+			return {'File no found ': route },404
+
 
 	def put(self,route):
 
@@ -74,11 +80,11 @@ class File(Resource):
 				Es una carpeta
 				'''
 
-				return 202
+				return 200
 
 		
 		else:
-			return 404
+			return {'File no found ': route },404
 	
 	def post(self,route):
 		_route = os.path.join(UPLOAD_FOLDER,route)
@@ -97,11 +103,11 @@ class File(Resource):
 			
 			file = request.files['upload_file']
 			file.save(os.path.join(_route,file.filename))
-			return 200
+			return 201
 
 		except:
 
-			return 400
+			return {'File not save ': route },404
 
 
 	def get(self,route):
@@ -119,7 +125,7 @@ class File(Resource):
 			except:
 				return 404
 		else:
-			return jsonify(f'file no found. {path.name}',404)
+			return {'File no found ': route },404
 
 
 

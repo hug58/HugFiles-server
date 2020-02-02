@@ -15,16 +15,29 @@ def _files(path):
 
 
 def list_files(path):
+	
 	_list_files = []
+	_dirs = {}
+
+	#_list_files = {}
+
 
 	for route,dirs,files in os.walk(path,topdown=True):	
 		route = route.replace('\\','/')
+
 		for file in files:		
+			
 			filename = route + '/' +  file
 			_file = info_file(filename)
-			_list_files.append(_file)
+			_list_files.append(_file) 
 
-	return _list_files
+
+		#dirs = _list_files
+		_dirs[route] = _list_files
+		_list_files = []
+
+
+	return _dirs
 
 
 

@@ -11,6 +11,7 @@ import requests
 USERS = set()
 
 
+URL_API = 'http://127.0.0.1:5000/'
 API = 'http://127.0.0.1:5000/list/files'
 
 async def register(websocket):
@@ -19,13 +20,51 @@ async def register(websocket):
 async def unregister(websocket):
 	USERS.remove(websocket)
 
+async def _data(_message):
+
+	filename = _message['path'] + '/' +  _message['name']
+	url = URL_API + filename.replace('data/files/','list/files/')
+
+	'''
+	obteniendo la data del file de la API
+	'''
+
+
+	r = requests.get(url,timeout=5)
+
+	'''
+	actualizando el status
+	'''
+
+	data = {}
+
+	if r.status_code == 200:
+
+		data = r.json()	
+
+		
+		data['status'] = _message['status']
+
+		if _message['status'] == 'renamed':
+			data['oldname'] = _message['oldname']
+
+	else:
+		data = _message
+
+
+	return data
+
+
 async def notitfy_state(message):
+
 	if USERS:
 
 		_message = json.loads(message)
-		print(f"Message: {_message}")
+		data = await _data(_message)
+		message = json.dumps(data)
 
-		await asyncio.wait([ user.send(message) for user in USERS ]) #if user != websocket
+
+		await asyncio.wait([ user.send(message) for user in USERS ]) 
 
 
 
@@ -38,18 +77,15 @@ async def main(websocket,path):
 	'''
 	
 	data =requests.get(API)
-
-	while data.status_code != 200:
-		data = requests.get(API)
-		await asyncio.sleep(1)
-
 	data = data.json()
 
 	try:
 
 
-		for file in data:
-			await websocket.send( json.dumps(file) )
+		for root in data.keys():
+
+			for file in data[root]:
+				await websocket.send( json.dumps(file) )
 
 		async for message in websocket:
 			await notitfy_state(message)
