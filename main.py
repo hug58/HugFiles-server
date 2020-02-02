@@ -45,6 +45,10 @@ async def _data(_message):
 		
 		data['status'] = _message['status']
 
+		'''
+		Agrega la key "oldname"
+		'''
+
 		if _message['status'] == 'renamed':
 			data['oldname'] = _message['oldname']
 
@@ -83,7 +87,6 @@ async def main(websocket,path):
 
 
 		for root in data.keys():
-
 			for file in data[root]:
 				await websocket.send( json.dumps(file) )
 
