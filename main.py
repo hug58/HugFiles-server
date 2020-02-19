@@ -11,8 +11,22 @@ import requests
 USERS = set()
 
 
-URL_API = 'http://127.0.0.1:5000/'
-API = 'http://127.0.0.1:5000/list/files'
+
+import socket
+
+
+from __init__ import host_ip,port_api,port_ws
+
+''' obtiene la ip de la api si se encuentra en la misma maquina,
+	sino cambiarlo manualmente
+'''
+
+
+#host y puerto de la API
+URL_API = f'http://{host_ip}:{port_api}/'
+
+
+
 
 async def register(websocket):
 	USERS.add(websocket)
@@ -42,19 +56,30 @@ async def _data(_message):
 
 		data = r.json()	
 
-		
-		data['status'] = _message['status']
 
-		'''
-		Agrega la key "oldname"
-		'''
+		try:
 
-		if _message['status'] == 'renamed':
-			data['oldname'] = _message['oldname']
+			data['status'] = _message['status']
+
+			'''
+			Agrega la key "oldname"
+			'''
+
+			if _message['status'] == 'renamed':
+				data['oldname'] = _message['oldname']
+
+
+
+			
+		except KeyError as e:
+			data = _message
+			#Es una carpeta
+
 
 	else:
 		data = _message
 
+		
 
 	return data
 
@@ -76,19 +101,31 @@ async def main(websocket,path):
 	
 	await register(websocket)
 
+	print(f'USERS: {len(USERS)}')
+
 	'''
 	petición get para obtener la lista json de todos los archivos
 	'''
 	
-	data =requests.get(API)
+
+	data =requests.get(URL_API + 'list/files')
 	data = data.json()
 
 	try:
 
 
 		for root in data.keys():
-			for file in data[root]:
+
+
+			_dir_root = data[root]['root'] #Enviando informacion de la carpeta
+			await websocket.send( json.dumps(_dir_root) )
+
+
+			for file in data[root]['files']:
 				await websocket.send( json.dumps(file) )
+
+
+
 
 		async for message in websocket:
 			await notitfy_state(message)
@@ -101,7 +138,15 @@ async def main(websocket,path):
 
 if __name__ == '__main__':
 
-	start_server = websockets.serve(main,"localhost",7000)
+
+
+	'''
+	la API estará en el puerto 5000 y el ws en 7000 de la misma ip
+	'''
+
+
+
+	start_server = websockets.serve(main,host_ip,port_ws)
 
 	asyncio.get_event_loop().run_until_complete(start_server)
 	asyncio.get_event_loop().run_forever()

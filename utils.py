@@ -18,8 +18,7 @@ def list_files(path):
 	
 	_list_files = []
 	_dirs = {}
-
-	#_list_files = {}
+	root = {}
 
 
 	for route,dirs,files in os.walk(path,topdown=True):	
@@ -32,8 +31,25 @@ def list_files(path):
 			_list_files.append(_file) 
 
 
-		#dirs = _list_files
-		_dirs[route] = _list_files
+
+
+		_dirs[route] = {}
+
+
+
+		#Lista de archivos
+
+		_dirs[route]['files'] = _list_files
+
+		root = info_file(route)
+
+
+
+		#Indexando data de la carpeta root
+
+
+		_dirs[route]['root'] = root
+
 		_list_files = []
 
 

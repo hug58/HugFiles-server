@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HugFiles</title>
+	<style type="text/css">
+			
+		.table tr td{
+			
+		}
+
+	</style>
+</head>
+<body>
+
+
+
+
+	<script type="text/javascript">
+
+
+
+		//Conexion websocket con el servidor main.py
+		const ws= new WebSocket("ws://{{host_ip}}:{{port_ws}}");
+		//messages = document.createElement('tr');
+
+		function done(messages,data){
+
+			//agregando fila del msg
+			message = document.createElement('tr');
+			
+
+			//creando columnas
+			let tdName = document.createElement('td'),
+			tdSize = document.createElement('td'),
+			tdModified = document.createElement('td'),
+			tdAcces = document.createElement('td'),
+			tdPath = document.createElement('td');
+
+
+			//creando link en el nombre del archivo
+			let aName = document.createElement('a',Attr='href');
+			aName.href = `http://{{host_ip}}:5000/${data["path"]}/${data["name"]} `
+
+
+			let name = document.createTextNode(data["name"]),
+			size = document.createTextNode(data["size"]),
+			modifiedTime = document.createTextNode(data["modified time"]),
+			accessTime = document.createTextNode(data["acces time"]),
+			path = document.createTextNode(data["path"]);
+
+
+
+
+			//Añadiendo string/nombre del archivo al link
+			aName.appendChild(name)
+
+			//agregando link a la columna Name
+			tdName.appendChild(aName);
+
+
+			//Agregando la data en la caja de texto
+			tdSize.appendChild(size);
+			tdModified.appendChild(modifiedTime);
+			tdAcces.appendChild(accessTime);
+			tdPath.appendChild(path);
+
+
+			//Agregamdp las columnas a la fila
+			message.appendChild(tdName);	
+			message.appendChild(tdSize);
+			message.appendChild(tdModified);
+			message.appendChild(tdAcces);
+			message.appendChild(tdPath);
+
+			//Agregando fila a la tabla
+			messages.appendChild(message);
+
+		}
+
+		function removed(){
+
+		}
+
+
+		ws.onmessage = function(event){
+			
+			//obteniendo la table
+			let messages = document.getElementsByClassName('table')[0]
+
+
+			//parsiando json en un objecto
+			let data = JSON.parse(event.data);
+
+			if (data['status'] == 'done' ) {
+				done(messages,data);
+			}
+
+			if (data['status'] == 'removed') {
+				removed(message,data);
+			}
+
+
+		}
+
+		//document.body.appendChild(messages);
+
+
+	</script>
+
+
+
+	<div style="text-align: center; margin: 2%;">
+		<form action="/" method="POST">
+			<input type="file" name="" placeholder="Subir">
+			<button> subir </button>
+		</form>
+	</div>
+
+		
+	<div style="display: flex; justify-content: center;">
+			
+		<table border="solid 2px;" class="table">
+
+				
+			<tr>
+				<th>Name</th>
+				<th>Size</th>
+				<th>Modified time</th>
+				<th>Created time</th>
+				<th>Path</th>				
+
+			</tr>
+
+		</table>			
+
+	</div>	
+
+
+
+</body>
+
+
+
+</html>
