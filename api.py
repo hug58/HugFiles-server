@@ -150,31 +150,37 @@ class File(Resource):
 		elif os.path.isdir(_route):
 
 
-			try:
+			return 200
+
+			'''
+
+				try:
 
 
-				print(_route)
+					print(_route)
 
-				print("Creando archiv..")
-
-
-				basename = f'{UPLOAD_FOLDER}/temp/{path.name}' 
-				filename = shutil.make_archive(basename,'zip',_route)
-				print(f'creado archivo {path.name}')
+					print("Creando archiv..")
 
 
-				path_zip = Path(filename)
+					basename = f'{UPLOAD_FOLDER}/temp/{path.name}' 
+					filename = shutil.make_archive(basename,'zip',_route)
+					print(f'creado archivo {path.name}')
 
 
-				return send_from_directory(
-					path_zip.parent,
-					path_zip.name,
-					)
+					path_zip = Path(filename)
+
+
+					return send_from_directory(
+						path_zip.parent,
+						path_zip.name,
+						)
 
 
 
-			except:
-				return {'Carpeta no comprimida ':route} ,500
+				except:
+					return {'Carpeta no comprimida ':route} ,500
+
+			'''
 
 		else:
 			return {'File no found ': route },404
@@ -182,7 +188,7 @@ class File(Resource):
 
 
 
-	
+
 if __name__ == '__main__':
 
 

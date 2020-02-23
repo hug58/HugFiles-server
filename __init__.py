@@ -28,4 +28,5 @@ host_ip = socket.gethostbyname(host_name)
 
 #Puerto del websocket
 port_ws = 8000
+#api rest
 port_api = 5000

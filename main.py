@@ -117,8 +117,8 @@ async def main(websocket,path):
 		for root in data.keys():
 
 
-			_dir_root = data[root]['root'] #Enviando informacion de la carpeta
-			await websocket.send( json.dumps(_dir_root) )
+			#_dir_root = data[root]['root'] #Enviando informacion de la carpeta
+			#await websocket.send( json.dumps(_dir_root) )
 
 
 			for file in data[root]['files']:
@@ -141,7 +141,7 @@ if __name__ == '__main__':
 
 
 	'''
-	la API estará en el puerto 5000 y el ws en 7000 de la misma ip
+	la API estará en el puerto 5000 y el ws en 8000 de la misma ip
 	'''
 
 
@@ -151,4 +151,3 @@ if __name__ == '__main__':
 	asyncio.get_event_loop().run_until_complete(start_server)
 	asyncio.get_event_loop().run_forever()
 
-	print(__name__)

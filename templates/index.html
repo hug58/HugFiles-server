@@ -2,6 +2,8 @@
 <html>
 <head>
 	<title>HugFiles</title>
+	
+
 	<style type="text/css">
 			
 		.table tr td{
@@ -9,10 +11,6 @@
 		}
 
 	</style>
-</head>
-<body>
-
-
 
 
 	<script type="text/javascript">
@@ -82,6 +80,11 @@
 		}
 
 
+		function created(){
+
+		}
+
+
 		ws.onmessage = function(event){
 			
 			//obteniendo la table
@@ -90,6 +93,7 @@
 
 			//parsiando json en un objecto
 			let data = JSON.parse(event.data);
+			console.log(data);
 
 			if (data['status'] == 'done' ) {
 				done(messages,data);
@@ -109,12 +113,10 @@
 
 
 
-	<div style="text-align: center; margin: 2%;">
-		<form action="/" method="POST">
-			<input type="file" name="" placeholder="Subir">
-			<button> subir </button>
-		</form>
-	</div>
+
+</head>
+<body>
+
 
 		
 	<div style="display: flex; justify-content: center;">
