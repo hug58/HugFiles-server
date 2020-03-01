@@ -22,7 +22,7 @@ from __init__ import UPLOAD_FOLDER
 
 
 #Empaquetar directorios 
-import shutil
+#import shutil
 
 
 
@@ -163,7 +163,7 @@ class File(Resource):
 
 
 					basename = f'{UPLOAD_FOLDER}/temp/{path.name}' 
-					filename = shutil.make_archive(basename,'zip',_route)
+					f#ilename = shutil.make_archive(basename,'zip',_route)
 					print(f'creado archivo {path.name}')
 
 
@@ -187,33 +187,5 @@ class File(Resource):
 
 
 
-
-
-if __name__ == '__main__':
-
-
-
-
-	app = Flask(__name__)
-	app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-	api = Api(app)
-
-
-	api.add_resource(ListFiles,
-					'/list/<path:route>',
-					)
-	api.add_resource(File,
-					'/data/<path:route>',
-					)
-
-
-
-
-	#app.run(debug =  True)
-
-	from __init__ import host_ip
-
-	app.run(host=host_ip, port=5000)
 
 

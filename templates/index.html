@@ -80,10 +80,6 @@
 		}
 
 
-		function created(){
-
-		}
-
 
 		ws.onmessage = function(event){
 			
@@ -95,7 +91,7 @@
 			let data = JSON.parse(event.data);
 			console.log(data);
 
-			if (data['status'] == 'done' ) {
+			if (data['status'] == 'done' || data['status'] == 'created') {
 				done(messages,data);
 			}
 
@@ -114,12 +110,22 @@
 
 
 
+
 </head>
 <body>
 
 
 		
 	<div style="display: flex; justify-content: center;">
+
+
+		<form method="POST">
+			<label for="upload_file"> Select a file </label>
+			<input type="file" name="upload_file" required="">
+			<label for="path"> Path </label>
+			<input type="text" name="path" placeholder="/data/files/" >
+			<button> Send File! </button>
+		</form>
 			
 		<table border="solid 2px;" class="table">
 
