@@ -28,21 +28,23 @@ def index():
 
 
 
+
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
+api = Api(app)
+
+
+api.add_resource(ListFiles,'/list/<path:route>',)
+api.add_resource(File,'/data/<path:route>',)
+
+
+
 if __name__ == '__main__':
 
 
-	app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-
-	api = Api(app)
-
-
-	api.add_resource(ListFiles,
-					'/list/<path:route>',
-					)
-	api.add_resource(File,
-					'/data/<path:route>',
-					)
 
 
 
