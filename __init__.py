@@ -23,7 +23,7 @@ import socket
 
 host_name = socket.gethostname()
 #obtenemos la ip del servidor y luego lo pasamos a app.run
-host_ip = socket.gethostbyname(host_name)
+host_ip = "0.0.0.0" #socket.gethostbyname(host_name)
 
 
 #Puerto del websocket
