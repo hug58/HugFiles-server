@@ -70,6 +70,7 @@ class CompressImage(object):
 		self.actions = self.validated_actions(kargs)
 
 
+
 	def validated_actions(self,kargs):
 		width = kargs.get('MAX_WIDTH')
 		if width:
@@ -156,10 +157,8 @@ class CompressImage(object):
 		_filename = _path.name
 
 
-		#print(_filename.rsplit(_format))
-		#filename,suffix = _filename.rsplit(_format)
-		
-		#return os.path.join(filename,suffix)
+		filename,suffix = _filename.rsplit(_format)
+		return filename + suffix
 
 
 	def set_restore_backup(self,dest,date):
@@ -167,9 +166,14 @@ class CompressImage(object):
 		for root,dirs,files in os.walk(self.restore_path):
 			for file in files:
 				_path = os.path.join(root,file)
-				image = self._rename_images_restore_backup(_path,date)
-				logging.debug(image)
-				shutil.copy(image,dest)
+				
+				image_dest = self._rename_images_restore_backup(_path,date)
+
+				_dir_path = root.rsplit(Path(self.restore_path).name)[1][1:] 
+				os.makedirs(_dir_path, exist_ok=True)
+
+				dest =os.path.join(_dir_path, image_dest)
+				shutil.copy(_path,dest)
 
 
 	def _get_backup_one(self,path):
@@ -272,13 +276,8 @@ class CompressImage(object):
 				path = os.path.join(root,file)
 				if imghdr.what(path):
 					
-					#print(path)
 					_dir_path = root.rsplit(Path(route).name)[1][1:] 
-					#print(path)
 					path = os.path.join(Path(route).name,_dir_path,file)
-					#print(os.path.abspath(path))
-					#print(path)
-					#print(path)
 					self._compress(path)
 
 
@@ -371,8 +370,6 @@ if __name__ == '__main__':
 
 
 	args = parser.parse_args()
-
-
 
 
 	input_path:str = args.path
