@@ -2,11 +2,11 @@
 <html>
 <head>
 	<title>Sistema de Archivos Retro</title>
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/config.css') }}">
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/file.css') }}">
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/folder.css') }}">
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/form.css') }}">
+	<link rel="stylesheet" href="../static/css/config.css">
+	<link rel="stylesheet" href="../static/css/file.css">
+	<link rel="stylesheet" href="../static/css/folder.css">
+	<link rel="stylesheet" href="../static/css/styles.css">
+	<link rel="stylesheet" href="../static/css/form.css">
 
 	<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
@@ -52,11 +52,11 @@
 		<div class="content">
 			<div class="folder">
 				<div class="folder-icon"></div>
-				<div class="folder-label">Carpeta 1</div>
+				<div class="folder-label" onclick="selectFolder('Carpeta 1')">Carpeta 1</div>
 			  </div>
 			  <div class="folder">
 				<div class="folder-icon"></div>
-				<div class="folder-label">Carpeta 2</div>
+				<div class="folder-label" onclick="selectFolder('Carpeta 2')">Carpeta 2</div>
 			  </div>
 
 			  <div class="file">
@@ -80,10 +80,10 @@
 	  </div>
 
 
-	  <script type="text/javascript" src="{{ url_for('static', filename='scripts/script.js') }}"></script>
-	  <script type="text/javascript" src="{{ url_for('static', filename='scripts/config.js') }}"></script>
-	  <script type="text/javascript" src="{{ url_for('static', filename='scripts/websocket.js') }}"></script>
-	  <script type="text/javascript" src="{{ url_for('static', filename='scripts/uploadfile.js') }}"></script>
+	  <script type="text/javascript" src="../static/scripts/script.js"></script>
+	  <script type="text/javascript" src="../static/scripts/config.js"></script>
+	  <script type="text/javascript" src="../static/scripts/websocket.js"></script>
+	  <script type="text/javascript" src="../static/scripts/uploadfile.js"></script>
 
 </body>
 </html>

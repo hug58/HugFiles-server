@@ -1,0 +1,28 @@
+  .folder {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    
+    .folder-icon {
+      width: 50px;
+      height: 50px;
+      background-color: #ccc;
+      border: 1px solid #999;
+      border-radius: 3px;
+      margin-right: 10px;
+    }
+    
+    .folder-label {
+      font-size: 18px;
+    }
+
+    .folder:hover .folder-icon {
+      background-color: #999;
+    }
+    
+    .folder:hover .folder-label {
+      text-decoration: underline;
+    }
+    

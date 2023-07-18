@@ -1,0 +1,60 @@
+.gear-container {
+  position: relative;
+}
+
+.gear {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #333;
+  cursor: pointer;
+}
+
+.bar {
+  position: absolute;
+  width: 5px;
+  height: 10px;
+  background: #fff;
+  left: 50%;
+  top: 50%;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.bar:nth-child(2) {
+  transform: translateX(-50%) rotate(135deg);
+}
+
+.bar:nth-child(3) {
+  transform: translateX(-50%) rotate(225deg);
+}
+
+.options {
+  position: absolute;
+  top: 50%;
+  left: calc(-100% - 10px);
+  transform: translateY(-50%);
+  padding: 10px;
+  background: #fff;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  display: none;
+}
+
+.options ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.options li {
+  cursor: pointer;
+  padding: 5px;
+}
+
+.options li:hover {
+  background: #f2f2f2;
+}

@@ -1,0 +1,38 @@
+.file {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+  }
+  
+  .file-icon {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+    background-color: #ccc;
+    border: 1px solid #999;
+    border-radius: 3px;
+  }
+  
+  .file-label {
+    flex: 1;
+    font-weight: bold;
+    font-size: 14px;
+  }
+  
+  .file-size,
+  .file-modified-time,
+  .file-access-time,
+  .file-path {
+    margin-left: 10px;
+    font-size: 12px;
+  }
+  
+  .file:hover .file-icon {
+    background-color: #999;
+  }
+  
+  .file:hover .file-label {
+    text-decoration: underline;
+  }

@@ -34,7 +34,7 @@ def list_files(path: str) -> list:
 	return _list_files
 
 
-def info_file(filename: str) -> dict:
+def info_file(filename: str) -> list:
 	'''
 	Obtener la info basica de un archivo
 	la funcion replace cambia \\ a / para sistemas windows
@@ -45,11 +45,11 @@ def info_file(filename: str) -> dict:
 	_file = {
 		'name': path.name,
 		'path': str(path.parent).replace('\\', '/'),
-		'acces time': os.path.getatime(filename),
-		'modified time': os.path.getmtime(filename),
+		'created_at': os.path.getatime(filename),
+		'modified_at': os.path.getmtime(filename),
 		'size': os.path.getsize(filename),
 		'status': 'done',
 		'type': 'file' if os.path.isfile(filename) else 'dir',
 	}
 
-	return _file
+	return [_file]
