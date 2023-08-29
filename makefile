@@ -1,4 +1,6 @@
 
 
-run:
-	docker run -p 5000:5000 -e UPLOAD_FOLDER=FILES
+
+celery:
+	#load your environment before running it
+	celery worker  -A app.celery --loglevel=info
