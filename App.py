@@ -163,7 +163,7 @@ def token():
     if not data['email']: 
         return jsonify({'msg':'email empty'})
 
-    code, path = workspace(data['email'])
+    code, path = services.workspace(data['email'])
     return jsonify({'path':path,'code':code})
 
 if __name__ == '__main__':
