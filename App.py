@@ -5,10 +5,10 @@ import pathlib
 import hashlib
 import os
 
-from flask import Flask, render_template, request, send_from_directory, redirect, session,jsonify
+from flask import Flask, render_template, request, send_from_directory, redirect,jsonify
 from flask_socketio import SocketIO
 from flask_socketio import emit,join_room
-
+from urllib.parse import urljoin
 from celery import Celery
 from celery.task.control import revoke
 from watchdog import observers
@@ -21,7 +21,6 @@ app = Flask(__name__)
 app.config.from_pyfile('config.py')
 celery = Celery(app.name,broker=app.config['CELERY_BROKER_URL'],backend=app.config['CELERY_RESULT_BACKEND'])
 celery.conf.update(app.config)
-
 
 socketio = SocketIO(app,
 		message_queue=app.config['CELERY_BROKER_URL'],
@@ -48,10 +47,15 @@ def monitor(path, code):
                 message = monitorsystem.message
                 monitorsystem.message = {}
                 for file in message:
+                    print(file)
                     socket.emit('files',json.dumps(file), room=code)
                 _message = {}
     except KeyboardInterrupt:
         observer.stop()
+    except NotADirectoryError as err:
+        print("error from monitor",err)
+        observer.stop()
+        
     observer.join()
 
 @socketio.on('join')
@@ -60,7 +64,7 @@ def on_join(data):
     Login user to monitor
     """
     code = data['code']
-    path_user = os.path.join(app.config['UPLOAD_FOLDER'],code)
+    path_user = urljoin(app.config['UPLOAD_FOLDER'],code)
     join_room(code)
 
     if os.path.exists(path_user):
@@ -71,6 +75,7 @@ def on_join(data):
         for file in _files(path_user, code):
             emit('files',json.dumps(file), room=code)
         monitor.delay(path=path_user, code=code)
+        
     else:
 	    emit('notify',json.dumps({'message':'Email is not available'}), room=code)
 
@@ -112,10 +117,7 @@ def data(filename):
             return send_from_directory(path.parent, path.name)
         elif os.path.isdir(filename):
             return send_from_directory(path.parent, path.name)
-
-    
     elif request.method == 'POST':
-        #make directory if not exists
         if not os.path.isdir(filename): 
             os.makedirs(filename, exist_ok=True)
         

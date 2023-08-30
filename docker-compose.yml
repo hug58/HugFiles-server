@@ -2,14 +2,14 @@ version: '3.8'
 
 services:
   app:
-    image: hugfiles:3
+    build: .
+
     ports:
       - "5000:5000"
     depends_on:
       - redis
       - celery
     environment:
-      - EMAIL_TEST=prueba@mail.com
       - PORT=5000
       - FLASK_ENV=development
       - REDIS_HOST=redis
