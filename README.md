@@ -1,29 +1,44 @@
 # HugFiles Server
-servidor de archivos con sincronizacion de clientes usando Flask, Socketio, Celery y Redis
+file server with client synchronization using Flask, Socketio, Celery and Redis. Like dropbox
 
-## Primero instala las dependencias en tu maquina virtual 
+## INSTALL DEPENDENCIES
 ```bash
 pip install -r requirements.txt
 ```
 
-## Redis es un broker server 
-Tambien necesitas instalar el broker redis
+## Redis is a  broker server 
 More details about redis [Redis](https://redis.io/)
 
-### Configure config.py 
+### LOAD ENV
 
-```python
-UPLOAD_FOLDER = 'data' #Carpeta del servidor
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-SECRET_KEY = 'super secret!'
+```env
+export REDIS_HOST="127.0.0.1:6379"
+export CELERY_BROKER_URL="redis://localhost:6379/0"
+export CELERY_RESULT_BACKEND="redis://localhost:6379/1"
+export UPLOAD_FOLDER="data/files"
+export SECRET_KEY="super secret key"
 ```
 
-## Ejecute la tarea de celery 
+## RUN TASK CELERY 
 ```bash
-celery worker -A App.celery --loglevel=info
+#load your envirotments
+source .env
+celery worker -A app.celery --loglevel=info
 ```
 
-## Ahora el servidor socketio-flask
+## RUN SERVER 
 ```bash
-python App.py 
-``` 
+python app.py 
+```
+
+## TODO
+- [x] Create file
+- [x] Modified file (content)
+- [x] Sync with folders
+- [x] Client terminal 
+- [ ] Client web
+- [ ] Delete File 
+- [ ] Modified Name file
+- [ ] Authentication
+- [ ] Tests
+
