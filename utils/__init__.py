@@ -1,7 +1,7 @@
 
 import os.path
 from pathlib import Path
-from .upload import get_path
+from . import services 
 
 def _files(path: str, code:str) -> list:
     """Checks if it is a folder to get a list of info instead returns only a dictionary with the file info."""
@@ -32,7 +32,7 @@ def info_file(filename: str, code:str) -> list:
     """Get the basic info of a file the replace function changes to \\ a / for windows systems"""
     _file = {}
     path = Path(filename)
-    diff = os.path.relpath(path.parent,get_path(code))
+    diff = os.path.relpath(path.parent,services.get_path(code))
     diff = diff if diff != "." else ""
     
     _file = {

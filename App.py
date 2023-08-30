@@ -15,8 +15,7 @@ from watchdog import observers
 
 from utils import _files,list_files,info_file
 from utils import event_handler
-from utils.upload import workspace, get_path
-
+from utils import services
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
@@ -38,25 +37,22 @@ def monitor(path, code):
     sends the changes to connected clients
     """
     print("Ruta:",path)
-    socketio = SocketIO(message_queue = app.config['CELERY_BROKER_URL'])
-    monitorsystem = event_handler.EventHandler()
+    socket = SocketIO(message_queue = app.config['CELERY_BROKER_URL'])
+    monitorsystem = event_handler.EventHandler(code)
     observer = observers.Observer()
     try:
         observer.schedule(monitorsystem, path=path, recursive=True) 
         observer.start()
         while True:
             if monitorsystem.message != {}:
-                _message = monitorsystem.message
+                message = monitorsystem.message
                 monitorsystem.message = {}
-                socketio.emit('files',json.dumps(_message), room=code)
+                for file in message:
+                    socket.emit('files',json.dumps(file), room=code)
                 _message = {}
     except KeyboardInterrupt:
         observer.stop()
-    except:
-        print('Failed to send message to monitorsystem') 
-        pass
     observer.join()
-
 
 @socketio.on('join')
 def on_join(data):
@@ -97,23 +93,19 @@ def on_notify(data):
 @socketio.on('files')
 def handle_files(data):
     """
-    TODO 
+    send notifications to clients of files
     """
     code = data['code']
     path = os.path.join(app.config['UPLOAD_FOLDER'], data['data'])
     data = _files(path,code)
-    try:
-        for file in data:
-            emit('files', json.dumps(file), room=code)
-    except:
-        pass
+    for file in data:
+        emit('files', json.dumps(file), room=code)
 
 
 @app.route('/data/<path:filename>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def data(filename):
     """Handle files"""
     filename = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    print(filename)
     path = pathlib.Path(filename)
     if request.method == 'GET':
         if os.path.isfile(filename):
@@ -123,7 +115,7 @@ def data(filename):
 
     
     elif request.method == 'POST':
-        """make directory if not exists"""
+        #make directory if not exists
         if not os.path.isdir(filename): 
             os.makedirs(filename, exist_ok=True)
         
@@ -142,7 +134,7 @@ def data(filename):
                     if data and 'name' in data:
                         new_file = str(path.parent).replace('\\', '/') + data['name']
                         os.rename(path, new_file)
-                        return 200
+                        return jsonify({'msg':'save uploaded file'})
                 else:
                     request.files['upload_file'].save(filename)
                     return jsonify({'msg':'succesfully updated file'})
@@ -152,8 +144,8 @@ def data(filename):
         else:
             return {'File not found': filename}, 404
     elif request.method == 'DELETE':
-        #TODO: remove file upload
-        pass
+        services.delete(filename)
+        return jsonify({'msg':'deleted file'})
 
 
 @app.route('/', methods=['GET', 'POST'])

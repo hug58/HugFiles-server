@@ -14,3 +14,7 @@ def get_path(code:str) -> str:
     path = os.path.join(os.getenv('UPLOAD_FOLDER'),code)
     return path
     
+    
+def delete(path):
+    """for the moment this function deletes files in local storage"""
+    return os.remove(path)
