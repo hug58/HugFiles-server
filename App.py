@@ -4,6 +4,7 @@ import shutil
 import pathlib
 import hashlib
 import os
+import time
 
 from flask import Flask, render_template, request, send_from_directory, redirect,jsonify
 from flask_socketio import SocketIO
@@ -12,6 +13,7 @@ from urllib.parse import urljoin
 from celery import Celery
 from celery.task.control import revoke
 from watchdog import observers
+from watchdog.observers.polling import PollingObserver
 
 from utils import _files,list_files,info_file
 from utils import event_handler
@@ -35,21 +37,21 @@ def monitor(path, code):
     Monitors the file system events of a user's 'account' (folder) and then sends changes to connected clients 
     sends the changes to connected clients
     """
-    print("Ruta:",path)
+    print("path:",path)
     socket = SocketIO(message_queue = app.config['CELERY_BROKER_URL'])
-    monitorsystem = event_handler.EventHandler(code)
-    observer = observers.Observer()
+    monitorsystem = event_handler.EventHandler(path,code)
+    observer = PollingObserver()
     try:
-        observer.schedule(monitorsystem, path=path, recursive=True) 
+        observer.schedule(monitorsystem, path=path, recursive=True)
         observer.start()
         while True:
-            if monitorsystem.message != {}:
+            if monitorsystem.message:
                 message = monitorsystem.message
                 monitorsystem.message = {}
                 for file in message:
-                    print(file)
                     socket.emit('files',json.dumps(file), room=code)
                 _message = {}
+            time.sleep(2)
     except KeyboardInterrupt:
         observer.stop()
     except NotADirectoryError as err:
@@ -75,7 +77,6 @@ def on_join(data):
         for file in _files(path_user, code):
             emit('files',json.dumps(file), room=code)
         monitor.delay(path=path_user, code=code)
-        
     else:
 	    emit('notify',json.dumps({'message':'Email is not available'}), room=code)
 
@@ -83,11 +84,9 @@ def on_join(data):
 @socketio.on('disconnect')
 def on_disconnect():
     """ Kill tasks pending"""
-    try:
-        emit('notify',json.dumps({'message':f'Tasks {session["id_tasks"]} revoke '}))
-        revoke(session['id_tasks'],terminate=True)
-    except:
-        print("Failed to revoke")
+    #TODO: remove 
+    pass
+
 
 @socketio.on('notify')
 def on_notify(data):
@@ -101,7 +100,8 @@ def handle_files(data):
     send notifications to clients of files
     """
     code = data['code']
-    path = os.path.join(app.config['UPLOAD_FOLDER'], data['data'])
+    path =  urljoin(app.config['UPLOAD_FOLDER'],code)
+    
     data = _files(path,code)
     for file in data:
         emit('files', json.dumps(file), room=code)
@@ -110,13 +110,15 @@ def handle_files(data):
 @app.route('/data/<path:filename>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def data(filename):
     """Handle files"""
-    filename = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    filename = urljoin(app.config['UPLOAD_FOLDER'], filename)
+    
     path = pathlib.Path(filename)
     if request.method == 'GET':
         if os.path.isfile(filename):
+            send_from_directory(path.parent, path.name)
             return send_from_directory(path.parent, path.name)
         elif os.path.isdir(filename):
-            return send_from_directory(path.parent, path.name)
+            return jsonify({'msg':'is a directory'})
     elif request.method == 'POST':
         if not os.path.isdir(filename): 
             os.makedirs(filename, exist_ok=True)
@@ -139,6 +141,8 @@ def data(filename):
                         return jsonify({'msg':'save uploaded file'})
                 else:
                     request.files['upload_file'].save(filename)
+                    modified_at = round(os.path.getmtime(filename))
+                    os.utime(filename, (modified_at,modified_at))
                     return jsonify({'msg':'succesfully updated file'})
             else:
                 return jsonify({'msg':'did not update uploaded file'})

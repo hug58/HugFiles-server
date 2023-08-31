@@ -3,12 +3,12 @@ import os.path
 from pathlib import Path
 from . import services 
 
-def _files(path: str, code:str) -> list:
+def _files(path: str, code:str, status = None) -> list:
     """Checks if it is a folder to get a list of info instead returns only a dictionary with the file info."""
     if not os.path.isfile(path):
         return list_files(path,code)
     
-    return [info_file(path,code)]
+    return [info_file(path,code,status)]
 
 
 def list_files(path: str, code:str) -> list:
@@ -28,7 +28,7 @@ def list_files(path: str, code:str) -> list:
     return files
 
 
-def info_file(filename: str, code:str) -> list:
+def info_file(filename: str, code:str, status=None) -> list:
     """Get the basic info of a file the replace function changes to \\ a / for windows systems"""
     _file = {}
     path = Path(filename)
@@ -39,9 +39,9 @@ def info_file(filename: str, code:str) -> list:
         'name': path.name,
 		'path': str(diff),
 		'created_at': os.path.getatime(filename),
-		'modified_at': os.path.getmtime(filename),
+		'modified_at': round(os.path.getmtime(filename)),
 		'size': os.path.getsize(filename),
-		'status': 'done',
+		'status': 'done' if status is not None else status,
 		'type': 'file' if os.path.isfile(filename) else 'dir',
         'code': code,
 	}
