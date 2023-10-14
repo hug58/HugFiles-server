@@ -26,4 +26,4 @@ COPY . .
 EXPOSE 5000
 
 # Ejecuta la aplicación cuando se inicie el contenedor
-CMD ["python", "app.py"]
+CMD ["python", "main.py"]

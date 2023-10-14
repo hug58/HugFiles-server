@@ -11,5 +11,4 @@ bootstrap: requirements
 	@echo "Now run: make run"
 
 celery:
-	#load your environment before running it
-	celery worker  -A app.celery --loglevel=info
+	celery worker  -A main.celery --loglevel=info
