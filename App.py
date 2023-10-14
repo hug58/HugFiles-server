@@ -1,27 +1,23 @@
 import json
-import os.path
-import shutil
 import pathlib
-import hashlib
 import os
 import time
+from urllib.parse import urljoin
 
 from flask import Flask, render_template, request, send_from_directory, redirect,jsonify
 from flask_socketio import SocketIO
 from flask_socketio import emit,join_room
-from urllib.parse import urljoin
 from celery import Celery
 from celery.task.control import revoke
 from watchdog import observers
 from watchdog.observers.polling import PollingObserver
 
-from utils import _files,list_files,info_file
-from utils import event_handler
-from utils import services
+from utils import _files,event_handler, services
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
-celery = Celery(app.name,broker=app.config['CELERY_BROKER_URL'],backend=app.config['CELERY_RESULT_BACKEND'])
+celery = Celery(app.name,broker=app.config['CELERY_BROKER_URL'],
+                backend=app.config['CELERY_RESULT_BACKEND'])
 celery.conf.update(app.config)
 
 socketio = SocketIO(app,
@@ -34,8 +30,8 @@ tasks = {}
 @celery.task
 def monitor(path, code):
     """
-    Monitors the file system events of a user's 'account' (folder) and then sends changes to connected clients 
-    sends the changes to connected clients
+    Monitors the file system events of a user's 'account' (folder) and 
+    then sends changes to connected clients sends the changes to connected clients
     """
     print("path:",path)
     socket = SocketIO(message_queue = app.config['CELERY_BROKER_URL'])

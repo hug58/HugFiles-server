@@ -35,6 +35,7 @@ python app.py
 - [x] Create file
 - [x] Modified file (content)
 - [x] Sync with folders
+- [x] Send notification to all clients for changes of files
 - [x] Client terminal 
 - [ ] Client web
 - [ ] Delete File 
