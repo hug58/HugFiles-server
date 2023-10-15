@@ -2,6 +2,7 @@
 
 
 requirements:
+	pip install --upgrade pip
 	pip install -r requirements.txt
 
 
@@ -12,3 +13,7 @@ bootstrap: requirements
 
 celery:
 	celery worker  -A main.celery --loglevel=info
+
+
+run:
+	python main.py

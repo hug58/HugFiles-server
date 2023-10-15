@@ -8,7 +8,6 @@ from flask import Flask, render_template, request, send_from_directory, redirect
 from flask_socketio import SocketIO
 from flask_socketio import emit,join_room
 from celery import Celery
-from celery.task.control import revoke
 from watchdog import observers
 from watchdog.observers.polling import PollingObserver
 
