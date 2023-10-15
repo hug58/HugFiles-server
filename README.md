@@ -23,12 +23,12 @@ export SECRET_KEY="super secret key"
 ```bash
 #load your envirotments
 source .env
-celery worker -A app.celery --loglevel=info
+celery worker -A main.celery --loglevel=info
 ```
 
 ## RUN SERVER 
 ```bash
-python app.py 
+python main.py 
 ```
 
 ## TODO
