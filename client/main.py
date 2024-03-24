@@ -1,10 +1,12 @@
-import requests
-import socketio
+"""docstring"""
+
+import os
+import threading
 import asyncio
 import json
-import threading
-import os
 from urllib.parse import urljoin
+import socketio
+import requests
 
 from watchdog import observers
 from watchdog.observers.polling import PollingObserver
@@ -59,10 +61,18 @@ async def on_files(data):
 async def producer_file(message):
     """ only upload files, TODO:  deleted files"""
     if message['status'] == 'created':
-        requests.post(message['url'],files = {'upload_file': open(message['path'],'rb')})
+        print(f"url dir: {message['url']}")
+        req = requests.post(message['url'],
+                      files = {'upload_file': open(message['path'],'rb')},timeout=100)
+
+        print(req.text)
+        print(req.status_code)
+
     elif message['status'] == 'modified':
         try:
-            requests.put(urljoin(message['url'],message['name']), files = {'upload_file': open(message['path'],'rb')})
+            requests.put(urljoin(message['url'],message['name']), files = {'upload_file': open(message['path'],'rb')},
+                         timeout=100,
+                         headers={'Content-Type': 'application/json'})
         except IsADirectory as err:
             print(err)
             
@@ -87,26 +97,25 @@ async def producer_handler(path, code):
             await asyncio.sleep(1)
 
 async def main():
-    global DEFAULT_FOLDER 
+    global DEFAULT_FOLDER
     DEFAULT_FOLDER = get_config()['default_folder']
     USER = get_config()['user']
-    
-    
+
+
     tui = TerminalInterface(DEFAULT_FOLDER, USER)
-    
+
     tui.loop()
     set_folder(tui.path)
-    
-    code = tui.code 
+
+    code = tui.code
     await sio.connect(URL)
-    print(code)
+    print(f"Running code: {code}")
     await sio.emit("join",{'code':code})
     await producer_handler(DEFAULT_FOLDER,code)
-    
     await sio.wait()
-        
+
     print("Exiting...")
 
 if __name__ == '__main__':
-	loop = asyncio.get_event_loop()
-	loop.run_until_complete(main())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())

@@ -25,6 +25,6 @@ services:
       - REDIS_HOST=redis
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-    command: ["celery", "worker", "-A", "main.celery", "--loglevel=info"]
+    command: ["celery",  "-A", "main.celery","worker", "--loglevel=info"]
   redis:
     image: redis:6.2.5-alpine
