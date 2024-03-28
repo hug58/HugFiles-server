@@ -11,12 +11,14 @@ def _files(path: str, code:str, status = None) -> list:
     return [info_file(path,code,status)]
 
 
-def list_files(path: str, code:str) -> list:
+def list_files(path: Path, code:str) -> list:
     """List and enumerate files in a directory"""
     files = []
     for i, file in enumerate(os.listdir(path), 1):
-        route = path.replace('\\', '/')
-        filename = route + '/' + file
+        route =   path.replace('\\', '/') if os.name != 'posix' else path
+        # filename = route + '/' + file
+        filename = os.path.join(route,file)
+
         if os.path.isfile(filename):
             _file = info_file(filename,code)
             _file["id"] = i

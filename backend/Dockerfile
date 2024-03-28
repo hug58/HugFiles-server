@@ -16,6 +16,8 @@ RUN pip install --upgrade pip
 # Instala las dependencias de la aplicación
 RUN pip install  -r requirements.txt
 
+RUN pip install redis
+
 # Instala greenlet por separado
 RUN pip install --no-cache-dir greenlet
 

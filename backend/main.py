@@ -7,16 +7,26 @@ from urllib.parse import urljoin
 from flask import Flask, render_template, request, send_from_directory, redirect,jsonify
 from flask_socketio import SocketIO
 from flask_socketio import emit,join_room
-from celery import Celery
+from celery import Celery,Task
 from watchdog import observers
 from watchdog.observers.polling import PollingObserver
-
 from utils import _files,event_handler, services
 
+class FlaskTask(Task):
+    def __call__(self, *args: object, **kwargs: object) -> object:
+        with app.app_context():
+            return self.run(*args, **kwargs)
+
 app = Flask(__name__)
+
 app.config.from_pyfile('config.py')
-celery = Celery(app.name,broker=app.config['CELERY_BROKER_URL'],
-                backend=app.config['CELERY_RESULT_BACKEND'])
+
+print(f"app config: {app.config}")
+print(f"broken: {app.config['CELERY_BROKER_URL']}")
+print(f"result: {app.config['CELERY_RESULT_BACKEND']}")
+
+celery = Celery(app.import_name,broker=app.config['CELERY_BROKER_URL'],
+                backend=app.config['CELERY_RESULT_BACKEND'], task_cls=FlaskTask)
 celery.conf.update(app.config)
 
 socketio = SocketIO(app,
@@ -106,24 +116,29 @@ def handle_files(data):
 def data(filename):
     """Handle files"""
     filename = urljoin(app.config['UPLOAD_FOLDER'], filename)
-    
+
     path = pathlib.Path(filename)
     if request.method == 'GET':
         if os.path.isfile(filename):
-            send_from_directory(path.parent, path.name)
+            print("is a file")
+            send_from_directory(path.parent, path.name)   
             return send_from_directory(path.parent, path.name)
         elif os.path.isdir(filename):
-            return jsonify({'msg':'is a directory'})
+            # return jsonify({'msg':'is a directory'})
+            print(f"name is {path.name}")
+            return  json.dumps(_files(path.parent,"f1f58e8c06b2a61ce13e0c0aa9473a72"))
+        
+        return jsonify({"msg":"account does not exist"})
     elif request.method == 'POST':
         if not os.path.isdir(filename): 
             os.makedirs(filename, exist_ok=True)
-        
-        if not request.json:
-            file = request.files['upload_file']
-            file.save(os.path.join(filename, file.filename))
-            return jsonify({'msg':'save uploaded file'})
-        else:
-            return jsonify({'msg':'file not found'})
+
+        if 'upload_file' not in request.files:
+            return 'No file part in the request'
+
+        file = request.files['upload_file']
+        file.save(os.path.join(filename, file.filename))
+        return jsonify({'msg':'save uploaded file'})
          
     elif request.method == 'PUT':
         if os.path.exists(path):
@@ -158,14 +173,14 @@ def index():
 @app.route('/token', methods=['POST'])
 def token():
     """Get path with token"""
-    data = request.json
-    if  isinstance(data,dict) != True: 
+    data_token = request.json
+    if  isinstance(data_token,dict) is not True:
         return jsonify({'msg':'json invalid'})
-    if not data['email']: 
+    if not data_token['email']:
         return jsonify({'msg':'email empty'})
 
-    code, path = services.workspace(data['email'])
+    code, path = services.workspace(data_token['email'])
     return jsonify({'path':path,'code':code})
 
 if __name__ == '__main__':
-    socketio.run(app, host="0.0.0.0")
+    socketio.run(app, host="0.0.0.0",allow_unsafe_werkzeug=True,debug=False)
