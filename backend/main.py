@@ -120,16 +120,18 @@ def data(filename):
     path = pathlib.Path(filename)
     if request.method == 'GET':
         if os.path.isfile(filename):
-            send_from_directory(path.parent, path.name)
+            print("is a file")
+            send_from_directory(path.parent, path.name)   
             return send_from_directory(path.parent, path.name)
         elif os.path.isdir(filename):
-            return jsonify({'msg':'is a directory'})
+            # return jsonify({'msg':'is a directory'})
+            print(f"name is {path.name}")
+            return  json.dumps(_files(path.parent,"f1f58e8c06b2a61ce13e0c0aa9473a72"))
+        
+        return jsonify({"msg":"account does not exist"})
     elif request.method == 'POST':
         if not os.path.isdir(filename): 
             os.makedirs(filename, exist_ok=True)
-
-        print(request.files)
-        # print(request.json)
 
         if 'upload_file' not in request.files:
             return 'No file part in the request'
