@@ -11,7 +11,7 @@ class Api:
     def get_token(self, email:str) -> str:
         """ create and login user in database[dirs]"""
         url = urljoin(self.url, "/token")
-        response = requests.post(url, json={"email": email}, 
+        response = requests.post(url, json={"email": email},
                                  headers={'Content-Type': 'application/json'},timeout=10)
         if response.status_code == 200:
             code = response.json()["code"]

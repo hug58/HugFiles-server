@@ -70,6 +70,7 @@ def on_join(data):
     """
     Login user to monitor
     """
+    print(f"data client: {data}")
     code = data['code']
     path_user = urljoin(app.config['UPLOAD_FOLDER'],code)
     join_room(code)
@@ -174,6 +175,7 @@ def index():
 def token():
     """Get path with token"""
     data_token = request.json
+    print(data_token)
     if  isinstance(data_token,dict) is not True:
         return jsonify({'msg':'json invalid'})
     if not data_token['email']:
