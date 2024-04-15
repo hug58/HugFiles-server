@@ -10,7 +10,11 @@ from flask_socketio import emit,join_room
 from celery import Celery,Task
 from watchdog import observers
 from watchdog.observers.polling import PollingObserver
-from utils import _files,event_handler, services
+
+
+from utils.files_read import get_files
+from utils import services
+from utils import event_handler
 
 class FlaskTask(Task):
     def __call__(self, *args: object, **kwargs: object) -> object:
@@ -19,7 +23,7 @@ class FlaskTask(Task):
 
 app = Flask(__name__)
 
-app.config.from_pyfile('config.py')
+app.config.from_pyfile('./utils/config.py')
 
 print(f"app config: {app.config}")
 print(f"broken: {app.config['CELERY_BROKER_URL']}")
@@ -66,11 +70,12 @@ def monitor(path, code):
     observer.join()
 
 @socketio.on('join')
-def on_join(data):
+def on_join(data_join):
     """
     Login user to monitor
     """
-    code = data['code']
+    print(f"Join with client: {data_join}")
+    code = data_join['code']
     path_user = urljoin(app.config['UPLOAD_FOLDER'],code)
     join_room(code)
 
@@ -79,11 +84,11 @@ def on_join(data):
             'message':f'Email succesfully, dir: {code}',
             'path': code,
         }))
-        for file in _files(path_user, code):
+        for file in get_files(path_user, code):
             emit('files',json.dumps(file), room=code)
         monitor.delay(path=path_user, code=code)
     else:
-	    emit('notify',json.dumps({'message':'Email is not available'}), room=code)
+        emit('notify',json.dumps({'message':'Email is not available'}), room=code)
 
 
 @socketio.on('disconnect')
@@ -94,22 +99,26 @@ def on_disconnect():
 
 
 @socketio.on('notify')
-def on_notify(data):
+def on_notify(data_notify):
     """send notifications to clients of user"""
-    emit('notify', data)
+    emit('notify', data_notify)
 
 
 @socketio.on('files')
-def handle_files(data):
+def handle_files(data_token):
     """
     send notifications to clients of files
     """
-    code = data['code']
-    path =  urljoin(app.config['UPLOAD_FOLDER'],code)
+
+    code:str = data_token['code']  if type(data_token) == dict else data_token
+    # path =  urljoin(app.config['UPLOAD_FOLDER'],code)
+    path = app.config['UPLOAD_FOLDER']
+    path_user = urljoin(app.config['UPLOAD_FOLDER'],code)
+    data_handler = get_files(path_user,code)
     
-    data = _files(path,code)
-    for file in data:
-        emit('files', json.dumps(file), room=code)
+    for file in data_handler:
+        print(f"send {file.get('name')}")
+        emit('files', json.dumps(file))
 
 
 @app.route('/data/<path:filename>', methods=['GET', 'POST', 'PUT', 'DELETE'])
@@ -125,12 +134,11 @@ def data(filename):
             return send_from_directory(path.parent, path.name)
         elif os.path.isdir(filename):
             # return jsonify({'msg':'is a directory'})
-            print(f"name is {path.name}")
-            return  json.dumps(_files(path.parent,"f1f58e8c06b2a61ce13e0c0aa9473a72"))
-        
+            return  jsonify(get_files(path.parent,path.name))
+
         return jsonify({"msg":"account does not exist"})
     elif request.method == 'POST':
-        if not os.path.isdir(filename): 
+        if not os.path.isdir(filename):
             os.makedirs(filename, exist_ok=True)
 
         if 'upload_file' not in request.files:
@@ -144,9 +152,9 @@ def data(filename):
         if os.path.exists(path):
             if os.path.isfile(path):
                 if request.json:
-                    data = json.loads(request.get_json())
-                    if data and 'name' in data:
-                        new_file = str(path.parent).replace('\\', '/') + data['name']
+                    data_json = json.loads(request.get_json())
+                    if data_json and 'name' in data_json:
+                        new_file = str(path.parent).replace('\\', '/') + data_json['name']
                         os.rename(path, new_file)
                         return jsonify({'msg':'save uploaded file'})
                 else:

@@ -25,28 +25,25 @@ function done(idFile,data){
         // Crear la etiqueta de tamaño del archivo con el tamaño que recibes del back-end
         var fileSize = document.createElement("div");
         fileSize.classList.add("file-size");
-        fileSize.textContent = bytesToMB(data["size"] + " MB");
-    
-    
+        fileSize.textContent ="Size: " +  bytesToMB(data["size"]) + " MB";
         file.appendChild(fileSize);
     
         // Crear la etiqueta de tiempo modificado del archivo con la fecha que recibes del back-end
         var fileModifiedTime = document.createElement("div");
         fileModifiedTime.classList.add("file-modified-time");
-    
-    
-        fileModifiedTime.textContent = unixTimestampToDateString(modified_at);
+        fileModifiedTime.textContent = "Modified At: " + unixTimestampToDateString(modified_at);
+
         file.appendChild(fileModifiedTime);
         // Crear la etiqueta de tiempo de acceso del archivo con la fecha que recibes del back-end
         var fileAccessTime = document.createElement("div");
         fileAccessTime.classList.add("file-access-time");
-        fileAccessTime.textContent =  unixTimestampToDateString(created_at);
+        fileAccessTime.textContent =  "Accessed At:" +  unixTimestampToDateString(created_at);
         file.appendChild(fileAccessTime);
         
         // Crear la etiqueta de ruta del archivo con la ruta que recibes del back-end
         var filePath = document.createElement("div");
         filePath.classList.add("file-path");
-        filePath.textContent = data["path"];
+        filePath.textContent = "Path: " +  data["path"];
         file.appendChild(filePath);
     
         // Agregar el archivo al contenedor
@@ -61,13 +58,20 @@ function done(idFile,data){
 
 
 let id = 0;
+console.log("starting on files")
 
 socket.on('files',function(files){
+    console.log("recevied data")
+
     files = JSON.parse(files);
-    if(files['status'] || files['created']){
-        id ++;
-        done(id,files);
-    }
+    id ++;
+    console.log(files)
+    done(id,files);
+
+    // if(files['status'] || files['created']){
+    //     id ++;
+    //     console.log(id)
+    // }
 });
 
 

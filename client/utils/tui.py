@@ -1,18 +1,21 @@
 import os
-from utils import get_config
-from .api import Api
 from colorama import init, Fore
 
+from utils import get_config
+from .api import Api
+
 class TerminalInterface:
+    """Interface"""
     def __init__(self, default=None, user=None):
         self._email = user
         self._path = default
         self._connected = False
         self._code = None
         self.api = Api(get_config()['url'])
-        init()  
-        
+        init()
+
     def submit_email(self):
+        """Submit email"""
         color = Fore.RED
         while True:
             email = input("Input your email: ")
@@ -20,11 +23,9 @@ class TerminalInterface:
                 self._email = email
                 break
             print(f"{color}Please select a valid email {color}█{Fore.RESET}" )
-            
-
-        
 
     def select_folder(self):
+        """Select folder"""
         color = Fore.RED
         while True:
             folder_path = input("Select Directory: ")
