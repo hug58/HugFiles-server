@@ -28,7 +28,7 @@ function minimizeWindow() {
   windowElement.style.display = "none";
   var taskbarButton = document.createElement("button");
   taskbarButton.className = "taskbar-btn";
-  taskbarButton.textContent = "Mi ventana";
+  taskbarButton.textContent = "My Window"; // TODO: Remove this
   taskbarButton.onclick = function() {
     windowElement.style.display = "block";
     taskbarButton.remove();
@@ -41,9 +41,9 @@ function showInput() {
   inputContainer.className = "input-container";
   var inputElement = document.createElement("input");
   inputElement.type = "text";
-  inputElement.placeholder = "Nombre de la carpeta";
+  inputElement.placeholder = "Name of the folder";
   var buttonElement = document.createElement("button");
-  buttonElement.textContent = "Crear";
+  buttonElement.textContent = "Create";
   buttonElement.onclick = function() {
     createFolder(inputElement.value);
     inputContainer.remove();
@@ -54,6 +54,23 @@ function showInput() {
   windowElement.appendChild(inputContainer);
 }
 
+function inputPath() {
+  var inputContainer = document.createElement("div");
+  inputContainer.className = "input-container";
+  var inputElement = document.createElement("input");
+  inputElement.type = "text";
+  inputElement.placeholder = "folder's Name ";
+  var buttonElement = document.createElement("button");
+  buttonElement.textContent = "Input folder's path";
+  buttonElement.onclick = function() {
+    createFolder(inputElement.value);
+    inputContainer.remove();
+  };
+  inputContainer.appendChild(inputElement);
+  inputContainer.appendChild(buttonElement);
+
+  windowElement.appendChild(inputContainer);
+}
 
 
 function createWindow() {

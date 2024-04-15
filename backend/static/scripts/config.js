@@ -6,6 +6,9 @@ gear.addEventListener('click', () => {
 });
 
 function bytesToMB(bytes) {
+  if (bytes === 0){
+    return 0;
+  }
   const mb = bytes / (1024 * 1024);
   return mb.toFixed(2);
 }

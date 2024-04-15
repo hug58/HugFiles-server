@@ -2,7 +2,7 @@
 import re
 from watchdog import events
 from datetime import datetime, timedelta
-from utils import _files
+from .files_read import get_files
 
 class EventHandler(events.FileSystemEventHandler):
     """Send events to clients"""
@@ -18,4 +18,4 @@ class EventHandler(events.FileSystemEventHandler):
             return
         else:
             self.last_modified = datetime.now()
-        self.message = _files(event.src_path,self.code,status=event.event_type)
+        self.message = get_files(event.src_path,self.code,status=event.event_type)
