@@ -1,0 +1,46 @@
+.box {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+  cursor: pointer;
+  margin-bottom: 20px; /* Espacio entre archivos */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: var(--color-light-grey);
+}
+
+  
+.file-icon {
+  width: 40px;
+  height: 40px;
+  background-color: #ddd;
+  border: 1px solid #999;
+  border-radius: 3px;
+  margin-right: 10px;
+  position: relative;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Transición suave */
+}
+
+.file-icon:hover {
+  background-color: #ccc; /* Color de fondo más oscuro */
+  transform: scale(1.05); /* Aumentar tamaño al pasar el ratón */
+}
+
+/* Estilos para los archivos */
+.file-label {
+  font-size: 15px;
+  margin-right: 10px;
+}
+
+.file-size,
+.file-modified-time,
+.file-access-time,
+.file-path {
+  font-size: 12px;
+  color: #555;
+  margin-top: 5px; /* Espacio entre detalles del archivo */
+  margin-right: 15px;
+}
+

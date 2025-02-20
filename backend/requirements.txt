@@ -29,3 +29,5 @@ wcwidth==0.2.8
 Werkzeug==3.0.0
 wsproto==1.2.0
 zipp==3.17.0
+flask_cors==5.0.0
+flower==2.0.1

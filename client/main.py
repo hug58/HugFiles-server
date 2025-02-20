@@ -1,14 +1,10 @@
 """docstring"""
 
 import os
-import threading
 import asyncio
 import json
-from urllib.parse import urljoin
 import socketio
-import requests
 
-from watchdog import observers
 from watchdog.observers.polling import PollingObserver
 
 from utils import event_handler  
@@ -18,66 +14,52 @@ from utils.api import Api
 from utils import  set_folder, get_config
 
 sio = socketio.AsyncClient()
+data = get_config()
 
-data =  get_config()
 URL =  data['url']
 API_DOWNLOAD = data['api_download']
+
 global DEFAULT_FOLDER
 
 @sio.on('notify')
-async def on_notify(metadata):
-    global path_user 
-    data = json.loads(metadata)
-
-
-@sio.on('files')
-async def on_files(data):
+async def on_notify(data):
     """ get all files from server """
     global result
     result = ''
     try:
-        message = json.loads(data)
-        
-        message['path_user_local'] = os.path.join(DEFAULT_FOLDER, message['path'])
-        if message['status'] == 'created' or message['status'] == 'done':
-            result = actions.done(API_DOWNLOAD,message)
-        elif message['status'] == 'modified':
-            if modified(data): 
-                result = actions.created(API_DOWNLOAD,message)
-                
-        elif message['status'] == 'delete':
-                result = actions.deleted(message)
-        else:
-            #TODO
-            pass
-        
-        message = None
+        message: dict = json.loads(data)
+
+        if message.get("status"):
+            message['path_user_local'] = os.path.join(DEFAULT_FOLDER, message['path'])
+            if message['status'] == 'created' or message['status'] == 'done':
+                result = actions.done(API_DOWNLOAD,message)
+            elif message['status'] == 'modified':
+                if actions.modified(data): 
+                    result = actions.created(API_DOWNLOAD,message)
+            elif message['status'] == 'delete':
+                    result = actions.deleted(message)
+            
+            message = None
+
+        print(f"MESSAGE: {message['message']}")
         
     except TypeError as err:
-        #TODO: handle error
-        # print("error in function on_files",data, err)
         pass
+
 
 async def producer_file(message):
     """ only upload files, TODO:  deleted files"""
+    print(f"url dir :: {message['url']}")
+
     if message['status'] == 'created':
-        print(f"url dir: {message['url']}")
-        req = requests.post(message['url'],
-                      files = {'upload_file': open(message['path'],'rb')},timeout=100)
-
-        print(req.text)
-        print(req.status_code)
-
+        Api.send(message=message)
     elif message['status'] == 'modified':
         try:
-            requests.put(urljoin(message['url'],message['name']), files = {'upload_file': open(message['path'],'rb')},
-                         timeout=100,
-                         headers={'Content-Type': 'application/json'})
-        except IsADirectory as err:
+            Api.send("PUT",message)
+        except os.IsADirectory as err:
             print(err)
-            
     elif message['status'] == 'deleted':
-        pass 
+        Api.send("DELETE",message)
 
 
 async def producer_handler(path, code):
@@ -96,15 +78,15 @@ async def producer_handler(path, code):
         else:
             await asyncio.sleep(1)
 
+
 async def main():
     global DEFAULT_FOLDER
     DEFAULT_FOLDER = get_config()['default_folder']
     USER = get_config()['user']
 
-
     tui = TerminalInterface(DEFAULT_FOLDER, USER)
-
     tui.loop()
+
     set_folder(tui.path)
 
     code = tui.code

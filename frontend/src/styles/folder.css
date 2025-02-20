@@ -1,0 +1,179 @@
+/* Estilos generales */
+.content {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+/* Estilos para las carpetas */
+.folder {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px; /* Espacio entre carpetas */
+  cursor: pointer;
+
+}
+
+  
+.folder-icon {
+  width: 45px; /* Ajustado a 40px para coincidir con el icono de archivo */
+  height: 35px; /* Reducido proporcionalmente */
+  background-color: #ffd700; /* Color dorado para la carpeta */
+  position: relative;
+  border-radius: 3px 3px 0 0; /* Bordes más pequeños */
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3); /* Sombra más suave */
+  transition: background-color 0.3s ease; /* Transición suave */
+}
+
+.folder-icon::before {
+  content: '';
+  position: absolute;
+  top: -7px; /* Ajustado proporcionalmente */
+  left: 3px; /* Ajustado proporcionalmente */
+  width: 20px; /* Reducido proporcionalmente */
+  height: 7px; /* Reducido proporcionalmente */
+  background-color: #ffd700; /* Mismo color que la carpeta */
+  border-radius: 3px 3px 0 0; /* Bordes más pequeños */
+}
+
+.folder-icon::after {
+  content: '';
+  position: absolute;
+  top: -3px; /* Ajustado proporcionalmente */
+  left: 0;
+  width: 40px; /* Igual al ancho de la carpeta */
+  height: 7px; /* Reducido proporcionalmente */
+  background-color: #ffd700; /* Mismo color que la carpeta */
+  border-radius: 3px 3px 0 0; /* Bordes más pequeños */
+}
+
+
+/* Icono de correo electrónico  dentro de la carpeta */
+.email-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 10px;
+  background-color: transparent;
+  border: 2px solid #333;
+  border-radius: 3px;
+}
+
+.folder-icon .email-icon::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 10px;
+  background-color: #333;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+
+/* Icono del token dentro de la carpeta */
+.token-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  background-color: #388E3C; /* Color más oscuro para el token */
+  border-radius: 50%; /* Forma circular */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.folder-label {
+  font-size: 15px;
+  margin-left: 10px; /* Espacio entre el ícono y el texto */
+  margin-right: 10px; /* Espacio entre el ícono y el texto */
+  transition: text-decoration 0.3s ease; /* Transición suave */
+}
+
+.folder-label-underline {
+  text-decoration: underline; 
+}
+
+.folder-icon:hover {
+  transform: scale(1.05); /* Aumentar tamaño al pasar el ratón */
+}
+
+
+/* Icono de notificación (campana) dentro de la carpeta */
+.notification-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  background-color: #333;
+  /* border: 2px solid #333; */
+  border-radius: 50% 50% 0 0; /* Forma de campana */
+  animation: ring 2s infinite ease-in-out; 
+}
+
+.notification-icon-off {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  background-color: #333;
+  /* border: 2px solid #333; */
+  border-radius: 50% 50% 0 0; /* Forma de campana */
+}
+
+
+
+/* Detalle inferior de la campana */
+ .notification-icon::after, .notification-icon-off::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 4px;
+  background-color: #333;
+  border-radius: 50% 50% 0 0; 
+  
+} 
+
+
+
+/* Animación de la campana */
+@keyframes ring {
+  0%, 100% {
+    transform: translate(-50%, -50%) rotate(0deg);  
+    border-color: #333; /* Color inicial del borde */
+    background-color: #333;
+
+  }
+  25% {
+    transform: translate(-50%, -50%) rotate(15deg); 
+    border-color: #ff0000; /* Cambio a color rojo */
+    background-color: #ff0000; /* Cambio a color rojo */
+
+  }
+  50% {
+    transform: translate(-50%, -50%) rotate(0deg); 
+    border-color: #333; /* Vuelve al color original */
+    background-color: #333;
+  }
+  75% {
+    transform: translate(-50%, -50%) rotate(-15deg); 
+    border-color: #ff0000; /* Cambio a color rojo */
+    background-color: #ff0000; /* Cambio a color rojo */
+  }
+}

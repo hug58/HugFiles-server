@@ -19,7 +19,7 @@ class TerminalInterface:
         color = Fore.RED
         while True:
             email = input("Input your email: ")
-            if email and email != "":
+            if email and  len(email) > 0 :
                 self._email = email
                 break
             print(f"{color}Please select a valid email {color}█{Fore.RESET}" )
@@ -34,7 +34,6 @@ class TerminalInterface:
                 break
             
             print(f"{color}Please select a folder that exists {color}█{Fore.RESET}" )
-            
         
     def toggle_connection(self):
         self._connected = not self._connected
