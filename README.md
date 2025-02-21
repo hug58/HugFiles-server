@@ -2,9 +2,8 @@
 file server with client synchronization using Flask, Socketio, Celery and Redis. Like dropbox
 
 # THIS APP IS EASY TO RUNNING WITH DOCKET
-run ```
-    make docker
-bash```
+run ```bash
+    make docker```
 
 ## TODO
 - [x] Create file
