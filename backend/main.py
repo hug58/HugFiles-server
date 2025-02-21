@@ -73,6 +73,7 @@ def tasks():
 
 @app.route('/tasks/status/<task_id>')
 def task_status(task_id):
+    """ Return a task status """
     result = AsyncResult(task_id, app=celery)
     return jsonify({
         "task_id": task_id,
@@ -83,4 +84,5 @@ def task_status(task_id):
 
 if __name__ == '__main__':
     monitor.delay(path = app.config['UPLOAD_FOLDER'])
-    socketio.run(app, host="0.0.0.0",port=app.config['PORT'], allow_unsafe_werkzeug=True, debug=False)
+    socketio.run(app, host="0.0.0.0",port=app.config['PORT']
+                , allow_unsafe_werkzeug=True, debug=False)
