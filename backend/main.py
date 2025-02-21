@@ -1,14 +1,16 @@
-import json
+""" API HUGFILES"""
+
 import os
 from urllib.parse import urljoin
+import json
+
 from flask import jsonify
+from celery.result import AsyncResult
 
 from flask_socketio import  emit, join_room
 from app.utils.files_read import get_files
 from app import app, socketio, monitor, celery
-from celery.result import AsyncResult
 
-  
 @socketio.on('join')
 def on_join(data_join):
     """
@@ -21,11 +23,9 @@ def on_join(data_join):
 
     if os.path.exists(path_user):
         emit('notify', json.dumps({
-            'message': f'Conection established',
+            'message': 'Conection established',
             'path': code,
         }))
-    
-        # monitor.delay(path=path_user, code=code)  
 
     else:
         emit('notify', json.dumps({'message': 'Email is not available'}), room=code)
@@ -35,6 +35,7 @@ def on_join(data_join):
 def on_disconnect():
     """ Kill tasks pending """
     pass
+
 
 
 @socketio.on('notify')
@@ -51,7 +52,7 @@ def handle_files(data_token):
     code = data_token['code'] if isinstance(data_token, dict) else data_token
     path_user = urljoin(app.config['UPLOAD_FOLDER'], code)
     data_handler = get_files(path_user, code)
-    
+
     for file in data_handler:
         print(f"send {file.get('name')}")
         emit('files', json.dumps(file))
@@ -64,6 +65,8 @@ def index():
 
 @app.route('/tasks/monitor', methods=['GET'])
 def tasks():
+    """ Return a tasks monitor """
+
     result = monitor.delay(path = app.config['UPLOAD_FOLDER'])
     return jsonify({"message": "send task monitor", "task_id": result.id})
 
@@ -80,4 +83,4 @@ def task_status(task_id):
 
 if __name__ == '__main__':
     monitor.delay(path = app.config['UPLOAD_FOLDER'])
-    socketio.run(app, host="0.0.0.0", allow_unsafe_werkzeug=True, debug=True)
+    socketio.run(app, host="0.0.0.0",port=app.config['PORT'], allow_unsafe_werkzeug=True, debug=False)

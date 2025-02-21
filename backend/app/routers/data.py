@@ -26,9 +26,9 @@ def data(filename):
             return send_from_directory(path.parent, path.name)
         elif os.path.isdir(filename):
             return jsonify(get_files(filename, path.name))
-        
+
         return jsonify({"msg": "account does not exist"})
-    
+
     elif request.method == 'POST':
         if not os.path.isdir(filename):
             os.makedirs(filename, exist_ok=True)
@@ -43,11 +43,8 @@ def data(filename):
 
         return jsonify({'msg': 'save uploaded file' })
                         # , 'id': result.inserted_id})
-         
+
     elif request.method == 'PUT':
-        """
-        TODO: ADD NOTIFICATIONS
-        """
         if os.path.exists(path):
             if os.path.isfile(path):
                 if request.json:
@@ -65,7 +62,7 @@ def data(filename):
                 return jsonify({'msg': 'did not update uploaded file'})
         else:
             return {'File not found': filename}, 404
-    
+
     elif request.method == 'DELETE':
         services.delete(filename)
         return jsonify({'msg': 'deleted file'})

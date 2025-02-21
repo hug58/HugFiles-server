@@ -17,13 +17,15 @@ from app.utils import event_handler
 from app.routers import app_data, app_auth
 
 app = Flask(__name__)
+CORS(app)
+
 app.config.from_pyfile('./utils/config.py')
 app.register_blueprint(app_data, url_prefix='/data')
 app.register_blueprint(app_auth, url_prefix='/token')
 
-CORS(app)
 
-celery = Celery("main", broker=app.config['CELERY_BROKER_URL'], backend=app.config['CELERY_RESULT_BACKEND'],)
+celery = Celery("main", broker=app.config['CELERY_BROKER_URL']
+                , backend=app.config['CELERY_RESULT_BACKEND'],)
 celery.conf.update(app.config)
 
 
@@ -49,7 +51,8 @@ def monitor(path):
     observer = Observer()
 
     try:
-        try:
+        try:    
+            print(f"Monitoring START: {path}")
             observer.schedule(monitorsystem, path=path, recursive=True)
             observer.start()
             while True:
@@ -78,7 +81,7 @@ def monitor(path):
 
 
 @celery.task
-def reply_notificacion(code, data={}):
+def reply_notificacion(code, data:dict):
     """
     Monitors the file system events of a user's 'account' (folder) and 
     then sends changes to connected clients.

@@ -10,9 +10,8 @@ COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install  -r requirements.txt
 RUN pip install redis
-RUN pip install --no-cache-dir greenlet
 
 COPY . .
 
-EXPOSE 5000
+EXPOSE 8000
 
