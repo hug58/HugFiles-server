@@ -14,6 +14,6 @@ run ```
 - [x] Client web
 - [x] Delete File 
 - [x] Modified Name file
-- [-] Authentication
-- [-] Tests
+- [ ] Authentication
+- [ ] Tests
 

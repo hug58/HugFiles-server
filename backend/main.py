@@ -37,7 +37,6 @@ def on_disconnect():
     pass
 
 
-
 @socketio.on('notify')
 def on_notify(data_notify):
     """ Send notifications to clients of user """

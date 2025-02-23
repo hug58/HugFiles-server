@@ -231,9 +231,9 @@ const HandleWindow: React.FC = () => {
                   style={{ cursor: 'pointer' }}>
                   <div className="folder-icon"></div>
                   <div className="folder-label">{item.name}</div>
-
                   <div className="file-modified-time">Modified: {formatTimestamp(item.modified_at)}</div>
                   <div className="file-access-time">Created: {formatTimestamp(item.created_at)}</div>
+                  <div><button className="delete-icon" onClick={ () => fetchDeleteFile(item.name)}> DELETE </button></div>
 
                 </div>
               ) : ( // Si es un archivo
