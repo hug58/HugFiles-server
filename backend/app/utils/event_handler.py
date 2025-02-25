@@ -18,25 +18,26 @@ class EventHandler(events.FileSystemEventHandler):
 
 
     def on_any_event(self, event):
-        """catch all events"""
+        '''catch all events'''
         if datetime.now() - self.last_modified < timedelta(seconds=1):
             return
         else:
             self.last_modified = datetime.now()
 
         code = get_code_from_path(self.path, event.src_path)
+        print(f"CODE FROM PATH: {code}")
         self.message = get_files(event.src_path,code,status=event.event_type)
 
 
     def on_deleted(self, event:events.FileSystemEvent):
-        """Catch deleted events"""
+        '''Catch deleted events'''
         self.message = {}
         filename = pathlib.Path(event.src_path)
         code = get_code_from_path(self.path, event.src_path)
 
         self.message = [{
-            "name": filename.name,
-            "status": event.event_type,
-            "path": str(filename.parent),
-            "code": code,
+            'name': filename.name,
+            'status': event.event_type,
+            'path': str(filename.parent),
+            'code': code,
         }]

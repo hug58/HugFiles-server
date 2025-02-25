@@ -15,15 +15,14 @@ services:
     depends_on:
       - nginx
 
-  app:
+  backend:
     image: hugfiles-server-backend:v0
     ports:
       - "8000:8000"
     depends_on:
       - celery
 
-    command: gunicorn --worker-class gevent -w 1 --access-logfile - --log-level info main:app
-
+    command: gunicorn --worker-class gevent -w 2 --access-logfile - --log-level info  main:app
     environment:
       # - FLASK_ENV=development
       - REDIS_HOST=redis-server
@@ -33,11 +32,11 @@ services:
       - SECRET_KEY=secret
       - PORT=8000
 
-    healthcheck:
-      test: curl --fail http://0.0.0.0:8000/ || exit 1
-      interval: 5s
-      timeout: 10s
-      retries: 2
+    # healthcheck:
+    #   test: curl --fail http://0.0.0.0:8000/ || exit 1
+    #   interval: 5s
+    #   timeout: 10s
+    #   retries: 2
 
     networks:
       - fullstack
@@ -78,8 +77,11 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
-      app:
-        condition: service_healthy
+      - backend
+
+      # backend:
+        # condition: service_healthy
+
     networks:
       - fullstack
 

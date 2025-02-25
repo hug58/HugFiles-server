@@ -23,14 +23,20 @@ global DEFAULT_FOLDER
 
 @sio.on('notify')
 async def on_notify(data):
-    """ get all files from server """
+    '''get all files from server'''
     global result
     result = ''
     try:
         message: dict = json.loads(data)
 
-        if message.get("status"):
-            message['path_user_local'] = os.path.join(DEFAULT_FOLDER, message['path'])
+        if message.get('status'):
+            path_cloud = DEFAULT_FOLDER
+            if message['path'] != '/':
+                path_cloud =  os.path.join(DEFAULT_FOLDER, path_cloud)
+
+            message['path_user_local'] = path_cloud
+            print(f'COMING FROM server: {message}')
+            
             if message['status'] == 'created' or message['status'] == 'done':
                 result = actions.done(API_DOWNLOAD,message)
             elif message['status'] == 'modified':
@@ -49,10 +55,9 @@ async def on_notify(data):
 
 async def producer_file(message):
     """ only upload files, TODO:  deleted files"""
-    print(f"url dir :: {message['url']}")
-
     if message['status'] == 'created':
-        Api.send(message=message)
+        Api.send("POST",message=message)
+        
     elif message['status'] == 'modified':
         try:
             Api.send("PUT",message)
@@ -82,6 +87,7 @@ async def producer_handler(path, code):
 async def main():
     global DEFAULT_FOLDER
     DEFAULT_FOLDER = get_config()['default_folder']
+    print(f"DEFAULT_FOLDER: {DEFAULT_FOLDER}" )
     USER = get_config()['user']
 
     tui = TerminalInterface(DEFAULT_FOLDER, USER)

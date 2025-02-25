@@ -1,6 +1,8 @@
 import requests
 import json
+import os
 from urllib.parse import urljoin
+
 
 
 class Api:
@@ -11,8 +13,7 @@ class Api:
     def get_token(self, email:str) -> str:
         """ create and login user in database[dirs]"""
         url = urljoin(self.url, "/token")
-        response = requests.post(url, json={"email": email},
-                                 headers={'Content-Type': 'application/json'},timeout=10)
+        response = requests.post(url, json={"email": email},headers={'Content-Type': 'application/json'},timeout=10)
         if response.status_code == 200:
             code = response.json()["code"]
             print(f"loggin with code: {code}")
@@ -20,15 +21,30 @@ class Api:
         return ""
     
     @staticmethod
+    def download(message:dict) -> str:
+        pass
+    
+    @staticmethod
     def send(flags="GET",message={}):
         """Send data to server"""
         if flags == "POST":
-            response = requests.post(message['url'], files = {'upload_file': open(message['path'],'rb')},timeout=100)
+            path = message['path']
+            
+            response = requests.post(message['url'], 
+                files = {'upload_file': open(path,'rb')},
+                data= {'created_at': os.path.getatime(path),
+                       'modified_at': os.path.getmtime(path)},
+                timeout=100)
+            
             if response.status_code == 200:
                 return response.json()
             
         elif flags == "PUT":
-            response = requests.put(urljoin(message['url'],message['name']), files = {'upload_file': open(message['path'],'rb')},
+            path = message['path']
+            response = requests.put(urljoin(message['url'],message['name']), 
+                files = {'upload_file': open(path,'rb')},
+                data = {'created_at': os.path.getatime(path),
+                        'modified_at': os.path.getmtime(path)},
                 timeout=100,
                 headers={'Content-Type': 'application/json'})
         

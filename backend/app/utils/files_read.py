@@ -84,15 +84,19 @@ def info_file(filename: str, code:str, status=None) -> dict:
     diff = os.path.relpath(path.parent, services.get_path(code))
     diff = diff if diff != "." else "/"
 
+
+    hash_file:str = services.generate_file_hash(filename)
+
     _file = {
         'name': path.name,
 		'path': str(diff),
-		'created_at': os.path.getatime(filename),
+		'created_at': round(os.path.getatime(filename)),
 		'modified_at': round(os.path.getmtime(filename)),
 		'size': os.path.getsize(filename),
 		'status': 'done' if status is None else status,
 		'type': 'file' if os.path.isfile(filename) else 'dir',
         'code': code,
+        'hash': str(hash_file)
 	}
     return _file
 

@@ -82,6 +82,6 @@ def task_status(task_id):
 
 
 if __name__ == '__main__':
-    monitor.delay(path = app.config['UPLOAD_FOLDER'])
+    # monitor.delay(path = app.config['UPLOAD_FOLDER'])
     socketio.run(app, host="0.0.0.0",port=app.config['PORT']
                 , allow_unsafe_werkzeug=True, debug=False)
