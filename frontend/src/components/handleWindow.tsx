@@ -6,6 +6,8 @@ import DraggableWindow from './draggableWindow';
 import CreateFolderModal from './modalFolder'
 
 
+
+
 interface FileItem {
     name: string;
     code: string;
@@ -24,19 +26,11 @@ const HandleWindow: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); // Estado para abrir/cerrar el modal
 
 
-  //Función para realizar la llamada a la API
   const fetchData = async (currentPath: string) => {
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_SERVER_URL}/data/consult`, {
-          "code": token,
-          "filename": currentPath
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+        `${import.meta.env.VITE_SERVER_URL}/data/consult`,
+        {"code": token, "filename": `${currentPath}`}, 
       );
 
       if (response.data) {
@@ -52,26 +46,28 @@ const HandleWindow: React.FC = () => {
 
   const fetchDownload = async (filename: string) => {
     try {
-
-      //${token}${path}${filename}
       const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/data/download`,
-        {"code": token, "filename":`${path}${filename}`}, 
+        {"code": token, "filename": `${path}${filename}`}, 
         {responseType: 'blob',}
       );
 
+      // Verificar si la respuesta es exitosa
       if (!response.data) {
-        throw new Error('failed to fetch data');
+        throw new Error('Error downloading data');
       }
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
 
-      //Simulate clicking on the link to start downloading
+      // Simular el clic en el enlace para iniciar la descarga
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', filename); // Nombre del archivo al descargar
       document.body.appendChild(link);
 
-      link.click();
+     // Simular el clic en el enlace para iniciar la descarga
+     link.click();
+
+      // Limpiar y eliminar el enlace temporal
       window.URL.revokeObjectURL(url);
       document.body.removeChild(link);
 
@@ -84,12 +80,10 @@ const HandleWindow: React.FC = () => {
 
   const fetchDeleteFile = async (filename: string) => {
     try {
-      // Realizar la solicitud DELETE al servidor
       const response = await axios.delete(
         `${import.meta.env.VITE_SERVER_URL}/data/${token}${path}${filename}`
       );
-  
-      // Verificar si la respuesta es exitosa
+
       if (response.status === 200) {
         console.log('File deleted successfully');
         fetchData(path); // Actualizar la lista de archivos después de la eliminación
@@ -159,27 +153,28 @@ const HandleWindow: React.FC = () => {
         console.error('Error uploading file:', error);
       }
     } else {
-      console.error('No File Selected');
+      console.error('No file selected');
     }
   };
 
 
   const formatTimestamp = (timestamp:number) => {
-    const date = new Date(timestamp * 1000); // Convert to milliseconds
-    return date.toLocaleString(); // Format timestamp
+    const date = new Date(timestamp * 1000); // Convertir a milisegundos
+    return date.toLocaleString(); // Formatear la fecha
   };
 
 
   const handleCreateFolder = async (folderName: string) => {
     try {
+      // Aquí haces la llamada a la API para crear la carpeta
       const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/data/${token}${path}${folderName}`);
   
       if (response.status === 200) {
-        console.log('Carpeta creada con éxito');
-        fetchData(path); // Update list files
+        console.log('Directory created successfully');
+        fetchData(path); // Actualizar la lista de archivos/carpetas
       }
     } catch (error) {
-      console.error('Error to create folder:', error);
+      console.error('Error:', error);
     }
   };
   
@@ -198,26 +193,26 @@ const HandleWindow: React.FC = () => {
         <div className="toolbar">
           <form method="post" encType="multipart/form-data" onSubmit={handleFileUpload}>
             <label htmlFor="file-upload" className="primary-button">
-            <input id="file-upload" type="file" name="file" /> Select Files </label>
+            <input id="file-upload" type="file" name="file" /> Select file </label>
             <button type="submit" className="primary-button">Upload Files</button>
           </form>
 
           <div>
-            {/* Boton for open folder */}
+            {/* Botón para abrir el modal */}
             <button
               onClick={() => setIsModalOpen(true)}
-              className="primary-button">
+              className="primary-button"
+            >
               Folder
             </button>
 
-            {/* Modal for creations folder */}
+            {/* Modal de creación de carpeta */}
             <CreateFolderModal
               isOpen={isModalOpen}
               onClose={() => setIsModalOpen(false)}
               onCreate={handleCreateFolder}
             />
           </div>
-
 
 
         </div>
@@ -239,7 +234,7 @@ const HandleWindow: React.FC = () => {
                   <div><button className="delete-icon" onClick={ () => fetchDeleteFile(item.name)}> DELETE </button></div>
 
                 </div>
-              ) : ( // if a file
+              ) : ( // Si es un archivo
                 <div className="box" key={index}>
                   <div className="file-icon"></div>
                   {/* <div className="file-label"></div> */}
@@ -250,6 +245,7 @@ const HandleWindow: React.FC = () => {
                   <div>
                     <button className="delete-icon" onClick={ () => fetchDeleteFile(item.name)}> DELETE </button>
                   </div>
+                  {/* <div className="file-path">path: {item.path}</div> */}
                 </div>
               )
             ))

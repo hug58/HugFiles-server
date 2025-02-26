@@ -5,7 +5,6 @@ import DraggableWindow from '../draggableWindow';
 import io from 'socket.io-client';
 
 
-
 interface Notification {
   dir: string;
   message: string;
@@ -71,10 +70,8 @@ const LoginForm: React.FC= () => {
           }
     }
 
-  }, [token]); // Dependencia: token
+  }, [token]); 
 
-
-  
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,6 +103,7 @@ const LoginForm: React.FC= () => {
     height="400px"
     >
     <div className="content">
+
 			<div className="folder">
 				<div className="folder-icon">
 					<div className="email-icon"></div>
@@ -135,6 +133,7 @@ const LoginForm: React.FC= () => {
         </div>
 
           <div className="folder-label"> {token} </div>
+          
       </div>
 
             {/* Mostrar notificaciones */}
