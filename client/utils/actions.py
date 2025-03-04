@@ -2,7 +2,8 @@ import requests
 import os
 import hashlib
 from urllib.parse import urljoin
-
+from utils import set_hash_file
+import pathlib
 
 def __modified(url, message):
     '''Firing the "created" and "modified" events can generate errors'''
@@ -114,3 +115,8 @@ def _file_download(url,message):
             for chunk in r.iter_content(1024):
                 if chunk:
                     f.write(chunk)
+                  
+        path_name = pathlib.Path(filename).name
+        set_hash_file(path_name, filename, generate_file_hash(filename))
+    
+    return None

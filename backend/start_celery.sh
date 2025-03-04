@@ -13,6 +13,6 @@ done
 echo "Celery OK!"
 
 # run task monitor filesystem
-python -c "from app import monitor; monitor.delay('data/')"
+python -c "from app.tasks.monitor import monitor_folder; monitor_folder.delay('data/')"
 
 wait $CELERY_PID

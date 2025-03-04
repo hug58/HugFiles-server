@@ -10,26 +10,18 @@ from flask import  request, send_from_directory, jsonify
 from app.utils.files_read import get_files
 from app.utils import services
 
+#models
+from app.models.files import FilesModel
+
+
 app_data = Blueprint('data', __name__)
 
 
-@app_data.route('/<path:filename>', methods=['POST', 'PUT', 'DELETE'])
+@app_data.route('/resource/<path:filename>', methods=['POST', 'PUT', 'DELETE'])
 def data(filename):
-    '''Handle files.'''
-    
     path = pathlib.Path(filename)
     filename = urljoin(current_app.config['UPLOAD_FOLDER'], filename)
 
-
-    # if request.method == 'GET':
-    #     if os.path.isfile(filename):
-    #         path = pathlib.Path(filename)
-    #         print(f"FILENAME: {str(path.parent)} ::: {path.name}")
-    #         return send_from_directory(path.parent, path.name)
-    #     elif os.path.isdir(filename):
-    #         return jsonify(get_files(filename, path.name))
-
-    #     return jsonify({'msg': 'account does not exist'})
 
     if request.method == 'POST':
         if not os.path.isdir(filename):
@@ -52,25 +44,10 @@ def data(filename):
         return jsonify({'msg': 'save uploaded file' })
 
     elif request.method == 'PUT':
-        if os.path.exists(path):
-            if os.path.isfile(path):
-                if request.json:
-                    data_json = json.loads(request.get_json())
-                    if data_json and 'name' in data_json:
-                        new_file = str(path.parent).replace('\\', '/') + data_json['name']
-                        os.rename(path, new_file)
-                        return jsonify({'msg': 'save uploaded file'})
-                else:
-                    request.files['upload_file'].save(filename)
-                    if request.get('modified_at'):
-                        atime = int(request['created_at'])
-                        mtime = int(request['modified_at'])
-                        os.utime(full_path, (atime, mtime))
-                    return jsonify({'msg': 'successfully updated file'})
-            else:
-                return jsonify({'msg': 'did not update uploaded file'})
-        else:
-            return {'File not found': filename}, 404
+        ''' moves uploaded file to the specified location '''
+        if os.path.exists(filename):
+            new_path = request.args.get('new_path')
+            pass
 
     elif request.method == 'DELETE':
         services.delete(filename)
@@ -96,6 +73,19 @@ def consult():
     return jsonify(get_files(filename, code))
 
 
+@app_data.route('/files')
+def consult_files_db():
+    code = request.args.get('code')
+    
+    if not code:
+        return jsonify({'msg': 'Parameter "code" is required'}), 400
+
+    try:
+        files = FilesModel.find_by_code_and_status(code=code, exclude_status='deleted')
+        return jsonify({'files': files}, 200)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app_data.route('/download', methods=['POST'])
 def download():
@@ -109,22 +99,17 @@ def download():
     path = os.path.join(data_filename.get('code'),_path_filename )
     path = path.replace('\\', '/') if os.name != 'posix' else path
     filename = os.path.join(current_app.config['UPLOAD_FOLDER'], path)
-
     filename = os.path.join(os.path.abspath('.'), filename)
 
     
     try:
         if os.path.isfile(filename):
             _path = pathlib.Path(filename)
-            print(f"FILENAME: {str(_path.parent)} ::: {_path.name}")
             return send_from_directory(_path.parent, _path.name)
     except FileNotFoundError:
         abort(404)
-        print("FILE")
     except Exception as e:
-        # Manejar otros errores posibles
-        print("PROBANDO")
-        app.logger.error(f"Error al enviar el archivo: {e}")
+        app.logger.error(f"error in send file: {e}")
         abort(500)
     
     return filename

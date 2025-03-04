@@ -9,6 +9,8 @@ class Api:
     """Login and access"""
     def __init__(self, url):
         self.url = url
+        
+
 
     def get_token(self, email:str) -> str:
         """ create and login user in database[dirs]"""

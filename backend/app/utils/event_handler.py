@@ -1,9 +1,12 @@
 
 import re
 import pathlib
+import os
 from watchdog import events
 from datetime import datetime, timedelta
 from .files_read import get_files, get_code_from_path
+from . import services
+
 
 class EventHandler(events.FileSystemEventHandler):
     """Send events to clients"""
@@ -25,19 +28,21 @@ class EventHandler(events.FileSystemEventHandler):
             self.last_modified = datetime.now()
 
         code = get_code_from_path(self.path, event.src_path)
-        print(f"CODE FROM PATH: {code}")
         self.message = get_files(event.src_path,code,status=event.event_type)
 
 
     def on_deleted(self, event:events.FileSystemEvent):
         '''Catch deleted events'''
         self.message = {}
-        filename = pathlib.Path(event.src_path)
         code = get_code_from_path(self.path, event.src_path)
+        
+        path = pathlib.Path(event.src_path)
+        diff = os.path.relpath(path.parent, services.get_path(code))
+        diff = diff if diff != "." else "/"
 
         self.message = [{
-            'name': filename.name,
+            'name': path.name,
             'status': event.event_type,
-            'path': str(filename.parent),
+            'path': str(diff),
             'code': code,
         }]

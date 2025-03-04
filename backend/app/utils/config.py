@@ -7,4 +7,6 @@ CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
 SECRET_KEY = os.getenv('SECRET_KEY')
 FLASK_ENV = os.getenv('FLASK_ENV', 'development')
 PORT = os.getenv('PORT')
-# MONGODB_URI = os.getenv('MONGODB_URI')
+
+MONGODB_URI = os.getenv('MONGODB_URI','mongodb://localhost:27017/')
+DB_NAME = os.getenv('DB_NAME', 'hugofiles-server')

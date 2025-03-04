@@ -9,7 +9,8 @@ from celery.result import AsyncResult
 
 from flask_socketio import  emit, join_room
 from app.utils.files_read import get_files
-from app import app, socketio, monitor, celery
+from app import app, socketio, celery
+from app.tasks import monitor
 
 @socketio.on('join')
 def on_join(data_join):
@@ -79,6 +80,7 @@ def task_status(task_id):
         "status": result.status,
         "result": result.result if result.ready() else None
     })
+    
 
 
 if __name__ == '__main__':

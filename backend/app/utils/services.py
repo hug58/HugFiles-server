@@ -5,8 +5,6 @@ import hashlib
 
 from urllib.parse import urljoin
 from typing import Tuple
-
-from app.utils import db
 from .config import UPLOAD_FOLDER
 
 
@@ -16,11 +14,9 @@ def workspace(email:str) -> Tuple[str,str]:
     """for the moment this function saves files in local storage"""
     code =  hashlib.md5(email.encode()).hexdigest()
     path = urljoin(UPLOAD_FOLDER,code)
-    filename = urljoin(path, "db")
 
     if not os.path.isdir(path):
         os.makedirs(path, exist_ok=True)
-        db.BasicDb.initialize_file(filename)
 
     return (code,path)
 

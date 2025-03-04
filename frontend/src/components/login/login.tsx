@@ -21,13 +21,26 @@ const LoginForm: React.FC= () => {
 
   useEffect( () => {
     // Inicializar Socket.IO solo una vez cuando el componente se monta
-    socketRef.current = io(import.meta.env.VITE_SERVER_URL);
+    socketRef.current = io(import.meta.env.VITE_SERVER_URL, {    
+      reconnection: true, 
+      reconnectionAttempts: 5, 
+      reconnectionDelay: 1000, 
+      });
 
 
     // Configurar listeners de Socket.IO
     socketRef.current.on('connect', () => {
       console.log('Connected to server');
       socketRef.current.emit("join", { code: token });
+    });
+
+
+    socketRef.current.on('connect_error', (error:any) => {
+      console.error('Connection error:', error);
+      if (error.message === 'Invalid session') {
+        // Manejar sesión inválida
+        console.log('Sesión inválida. Reconectando...');
+      }
     });
 
 
@@ -77,7 +90,7 @@ const LoginForm: React.FC= () => {
     e.preventDefault();
 
     try {
-        const response = await axios.post(import.meta.env.VITE_SERVER_URL + '/token', {
+        const response = await axios.post(import.meta.env.VITE_SERVER_URL + '/token/account', {
         email: username,
       }, 
       {

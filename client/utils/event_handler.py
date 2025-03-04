@@ -19,14 +19,15 @@ class EventHandler(events.FileSystemEventHandler):
     def __init__(self,path, code):
         self.last_modified = datetime.now()
         self.message = {}
-        self.url = get_config()['url']
-        self.code = f"data/{code}"
+        self.url = get_config()['api_resource']
+        
+        self.code = code
         self.path = path
         
     def on_any_event(self, event):
-        """
+        '''
 			TODO
-        """
+        '''
         result = re.search(self.pattern, event.src_path)
         if datetime.now() - self.last_modified < timedelta(seconds=1):
             return
@@ -35,13 +36,10 @@ class EventHandler(events.FileSystemEventHandler):
             
         relative_path = os.path.relpath(event.src_path,self.path)
         relative_path = str(Path(relative_path).parent)
-        code = f"{self.code}/{relative_path}"
         
         self.message = {
 			'status': event.event_type,
 			'path': event.src_path,
 			'name': result.group(2),
-			'url': urljoin(self.url,code),
+			'url': urljoin(self.url,f'{self.code}/{relative_path}'),
 		}
-        if event.event_type == 'created':
-            pass

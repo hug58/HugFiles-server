@@ -6,8 +6,6 @@ import DraggableWindow from './draggableWindow';
 import CreateFolderModal from './modalFolder'
 
 
-
-
 interface FileItem {
     name: string;
     code: string;
@@ -23,7 +21,7 @@ const HandleWindow: React.FC = () => {
   const {token} = useToken();
   const [path, setPath] = useState<string>("/");
   const [dataList, setDataList] = useState<FileItem[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Estado para abrir/cerrar el modal
+  const [isModalOpen, setIsModalOpen] = useState(false); 
 
 
   const fetchData = async (currentPath: string) => {
@@ -77,11 +75,10 @@ const HandleWindow: React.FC = () => {
 
   };
 
-
   const fetchDeleteFile = async (filename: string) => {
     try {
       const response = await axios.delete(
-        `${import.meta.env.VITE_SERVER_URL}/data/${token}${path}${filename}`
+        `${import.meta.env.VITE_SERVER_URL}/data/resource/${token}${path}${filename}`
       );
 
       if (response.status === 200) {
@@ -108,46 +105,39 @@ const HandleWindow: React.FC = () => {
 
   }, [token]); // 
 
-
-  // Función para manejar el clic en una carpeta
   const handleFolderClick = (folderName: string) => {
-    const newPath = `${path}${folderName}/`; // Concatenar el nombre de la carpeta al path actual
-    setPath(newPath); // Actualizar el path
+    const newPath = `${path}${folderName}/`;
+    setPath(newPath);
   };
 
-  // Función para retroceder a la carpeta anterior
   const handleGoBack = () => {
       if (path === '/') return; 
-      const newPath = path.split('/').slice(0, -2).join('/') + '/'; // Eliminar la última carpeta del path
+      const newPath = path.split('/').slice(0, -2).join('/') + '/'; 
       setPath(newPath);
     };
 
-
-  // Función para manejar la subida del archivo
   const handleFileUpload = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); // Evitar el envío por defecto del formulario
-
+    event.preventDefault(); 
     const formData = new FormData();
     const fileInput = event.currentTarget.querySelector('input[type="file"]') as HTMLInputElement;
 
     if (fileInput && fileInput.files && fileInput.files[0]) {
       const file = fileInput.files[0];
-      formData.append('upload_file', file); // Agregar el archivo al FormData
-
+      formData.append('upload_file', file); 
       try {
         const response = await axios.post(
-          `${import.meta.env.VITE_SERVER_URL}/data/${token}${path}`,
+          `${import.meta.env.VITE_SERVER_URL}/data/resource/${token}${path}`,
           formData,
           {
             headers: {
-              'Content-Type': 'multipart/form-data', // Especificar el tipo de contenido
+              'Content-Type': 'multipart/form-data',
             },
           }
         );
 
         if (response.status === 200) {
           console.log('File uploaded successfully');
-          fetchData(path); // Actualizar la lista de archivos después de la subida
+          fetchData(path); 
         }
       } catch (error) {
         console.error('Error uploading file:', error);
@@ -157,21 +147,19 @@ const HandleWindow: React.FC = () => {
     }
   };
 
-
   const formatTimestamp = (timestamp:number) => {
-    const date = new Date(timestamp * 1000); // Convertir a milisegundos
-    return date.toLocaleString(); // Formatear la fecha
+    const date = new Date(timestamp * 1000);
+    return date.toLocaleString();
   };
 
 
   const handleCreateFolder = async (folderName: string) => {
     try {
-      // Aquí haces la llamada a la API para crear la carpeta
       const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/data/${token}${path}${folderName}`);
   
       if (response.status === 200) {
         console.log('Directory created successfully');
-        fetchData(path); // Actualizar la lista de archivos/carpetas
+        fetchData(path);
       }
     } catch (error) {
       console.error('Error:', error);
