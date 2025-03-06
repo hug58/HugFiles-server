@@ -27,7 +27,7 @@ async def on_notify(data):
     message: Api.Message = json.loads(data)
 
     if message.get('status'):
-        filename = os.path.join(DEFAULT_FOLDER, message['path'], message['name']) if message['path'] != '/' else os.path.join(BASE_DIR, message['name'])
+        filename = os.path.join(DEFAULT_FOLDER, message['path'], message['name']) if message['path'] != '/' else os.path.join(DEFAULT_FOLDER, message['name'])
             
         if (message['status'] == 'created' 
             or message['status'] == 'done'
