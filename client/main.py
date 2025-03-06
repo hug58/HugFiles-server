@@ -1,6 +1,7 @@
 """docstring"""
 
 import os
+import logging
 import asyncio
 import json
 import socketio
@@ -16,79 +17,75 @@ from utils import  set_folder, get_config
 sio = socketio.AsyncClient()
 data = get_config()
 
-URL =  data['url']
-API_DOWNLOAD = data['api_download']
-
+URL =  data.get('url')
 global DEFAULT_FOLDER
 
 @sio.on('notify')
 async def on_notify(data):
     '''get all files from server'''
-    global result
-    result = ''
-    try:
-        message: dict = json.loads(data)
+    
+    message: Api.Message = json.loads(data)
 
-        if message.get('status'):
-            path_cloud = DEFAULT_FOLDER
-            if message['path'] != '/':
-                path_cloud =  os.path.join(DEFAULT_FOLDER, path_cloud)
-
-            message['path_user_local'] = path_cloud
-            print(f'COMING FROM server: {message}')
+    if message.get('status'):
+        filename = os.path.join(DEFAULT_FOLDER, message['path'], message['name']) if message['path'] != '/' else os.path.join(BASE_DIR, message['name'])
             
-            if message['status'] == 'created' or message['status'] == 'done':
-                result = actions.done(API_DOWNLOAD,message)
-            elif message['status'] == 'modified':
-                if actions.modified(data): 
-                    result = actions.created(API_DOWNLOAD,message)
-            elif message['status'] == 'delete':
-                    result = actions.deleted(message)
-            
-            message = None
+        if (message['status'] == 'created' 
+            or message['status'] == 'done'
+            or message['status'] == 'modified'
+        ):
+            actions.done(filename,message)
 
-        print(f"MESSAGE: {message['message']}")
-        
-    except TypeError as err:
-        pass
+        elif message['status'] == 'delete':
+            actions.deleted(filename)
+            
+        message = {}
+
+
+@sio.event
+async def connect():
+    Api.check_last_time()
+    print("Conectado al servidor")
 
 
 async def producer_file(message):
-    """ only upload files, TODO:  deleted files"""
-    if message['status'] == 'created':
-        Api.send("POST",message=message)
-        
-    elif message['status'] == 'modified':
-        try:
-            Api.send("PUT",message)
-        except os.IsADirectory as err:
-            print(err)
-    elif message['status'] == 'deleted':
-        Api.send("DELETE",message)
+    '''only upload files, TODO:  deleted files.'''
+    try:
+        Api.send(message)
+    except Exception as err:
+        logging.error(f'ERROR IN OPERATIONS FILES:: {err}')
 
 
 async def producer_handler(path, code):
-    """Load monitor files and send notifications"""
+    '''Load monitor files and send notifications.'''
     monitorsystem = event_handler.EventHandler(path, code)
     observer = PollingObserver()
     observer.schedule(monitorsystem, path=path, recursive=True)
     observer.start()
-    print('Loading Monitorsystem')
-    
-    while True:
-        if monitorsystem.message != {}:
-            _message = monitorsystem.message
-            monitorsystem.message = {}
-            await producer_file(_message)
-        else:
-            await asyncio.sleep(1)
+    try:
+        print('Loading Monitorsystem')
+        
+        while True:
+            if monitorsystem.message != {}:
+                print(f'messaging procesing start: {monitorsystem.message}')
+                await producer_file(monitorsystem.message)
+                monitorsystem.message = {}
+                print(f'messaging procesing end: {monitorsystem.message}')
+                
+            else:
+                await asyncio.sleep(1)
+    except KeyboardInterrupt:
+        observer.stop()
 
+    observer.join()
 
 async def main():
     global DEFAULT_FOLDER
-    DEFAULT_FOLDER = get_config()['default_folder']
-    print(f"DEFAULT_FOLDER: {DEFAULT_FOLDER}" )
-    USER = get_config()['user']
+    DEFAULT_FOLDER = get_config('default_folder')
+    USER = get_config('user')
+
+    logging.info(f'DEFAULT_FOLDER: {DEFAULT_FOLDER}')
+    logging.info(f'USER: {USER}')
+    
 
     tui = TerminalInterface(DEFAULT_FOLDER, USER)
     tui.loop()
@@ -102,7 +99,6 @@ async def main():
     await producer_handler(DEFAULT_FOLDER,code)
     await sio.wait()
 
-    print("Exiting...")
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()

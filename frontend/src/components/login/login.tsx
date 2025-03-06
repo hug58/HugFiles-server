@@ -91,7 +91,7 @@ const LoginForm: React.FC= () => {
 
     try {
         const response = await axios.post(import.meta.env.VITE_SERVER_URL + '/token/account', {
-        email: username,
+        username: username,
       }, 
       {
         headers: {

@@ -82,7 +82,7 @@ def consult_files_db():
 
     try:
         files = FilesModel.find_by_code_and_status(code=code, exclude_status='deleted')
-        return jsonify({'files': files}, 200)
+        return jsonify({'files': files}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

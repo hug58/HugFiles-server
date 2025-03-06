@@ -5,35 +5,33 @@ from utils import get_config
 from .api import Api
 
 class TerminalInterface:
-    """Interface"""
     def __init__(self, default=None, user=None):
         self._email = user
         self._path = default
         self._connected = False
         self._code = None
-        self.api = Api(get_config()['url'])
         init()
 
     def submit_email(self):
-        """Submit email"""
+        ''' get email if config not available. '''
         color = Fore.RED
+        
         while True:
-            email = input("Input your email: ")
+            email = input('Input email: ')
             if email and  len(email) > 0 :
                 self._email = email
                 break
-            print(f"{color}Please select a valid email {color}█{Fore.RESET}" )
+            print(f'{color}Please select a valid email {color}█{Fore.RESET}')
 
     def select_folder(self):
-        """Select folder"""
         color = Fore.RED
         while True:
-            folder_path = input("Select Directory: ")
+            folder_path = input('Select Directory: ')
             if os.path.exists(folder_path) and os.path.isdir(folder_path):
                 self._path = folder_path
                 break
             
-            print(f"{color}Please select a folder that exists {color}█{Fore.RESET}" )
+            print(f'{color}Please select a folder that exists {color}█{Fore.RESET}')
         
     def toggle_connection(self):
         self._connected = not self._connected
@@ -41,7 +39,7 @@ class TerminalInterface:
 
     def draw_connection_circle(self):
         color = Fore.GREEN if self._connected else Fore.RED
-        print(f"{color} Connection Status: {color}█{Fore.RESET}")
+        print(f'{color} Connection Status: {color}█{Fore.RESET}')
         
     def loop(self):
         self.draw_connection_circle()
@@ -54,9 +52,9 @@ class TerminalInterface:
                 self.toggle_connection()
                 break
         
-        self._code = self.api.get_token(self._email)
+        self._code = Api.get_token(self._email)
         if not self._code:
-            print("failed to get token...")
+            print('failed to get token...')
         self.toggle_connection()
 
                 

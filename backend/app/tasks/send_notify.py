@@ -1,3 +1,4 @@
+import json
 from app import celery, socketio
 
 @celery.task

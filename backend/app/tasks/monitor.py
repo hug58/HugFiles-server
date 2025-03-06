@@ -28,7 +28,6 @@ def monitor_folder(path):
                         file: dict
                         
                         save_data.delay(file)                        
-                        
                         reply_notificacion.delay(file["code"], {
                             'name': file.get('name'),
                             'modified_at': file.get('modified_at') if file.get('modified_at') else '',
@@ -43,10 +42,10 @@ def monitor_folder(path):
                     monitorsystem.message = {}
                     
         except (KeyboardInterrupt, NotADirectoryError, FileNotFoundError) as err:
-            print(f"Error from monitor :::: {err}")
+            logging.error(f"MONITOR :: {err}")
             observer.stop()
     
         observer.join()
     
     except RuntimeError as err:
-        print(f'Error from monitor in thread :::: {err}')
+        logging.error(f'MONITOR IN THREAD :: {err}')

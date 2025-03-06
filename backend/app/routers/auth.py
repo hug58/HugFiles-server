@@ -25,6 +25,7 @@ def token():
     code, path = services.workspace(data_token['email'])
     return jsonify({'path': path, 'code': code})
 
+
 @app_auth.route('/account', methods=['POST'])
 def account():
     data = request.json

@@ -1,8 +1,17 @@
 {
-    "url": "http://127.0.0.1:8000",
+    "url": "http://127.0.0.1:80",
     "api_resource": "http://127.0.0.1:80/data/resource",
+    "url_token": "http://127.0.0.1:80/token/account",
     "api_download": "http://127.0.0.1:80/data/download",
-    "url_token": "http://127.0.0.1:80/token",
+    "url_logs": "http://127.0.0.1:80/logs/files",
+    "url_files": "http://127.0.0.1:80/data/files",
     "default_folder": "data",
-    "user": "hugo@test.com"
+    "user": "hugo@test.com",
+    "files": [
+        {
+            "filename": "cv_hugo_h_montanez.pdf",
+            "path": "data/cv_hugo_h_montanez.pdf",
+            "hash": "56b6a96c67cb9e54024388f5c9bdc4ebd188a0eec4d0d95ce3f63f21e0f4dee4"
+        }
+    ]
 }
