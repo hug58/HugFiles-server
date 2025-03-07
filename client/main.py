@@ -66,10 +66,16 @@ async def producer_handler(path, code):
         
         while True:
             if monitorsystem.message != {}:
-                print(f'messaging procesing start: {monitorsystem.message}')
-                await producer_file(monitorsystem.message)
+                
+                for file in get_config('files'):
+                    file:dict 
+                    if (
+                        file.get('name') == monitorsystem.message.get('name') and
+                        file.get('path') == monitorsystem.message.get('path') and
+                        file.get('hash') != monitorsystem.message.get('hash')):
+                
+                        await producer_file(monitorsystem.message)
                 monitorsystem.message = {}
-                print(f'messaging procesing end: {monitorsystem.message}')
                 
             else:
                 await asyncio.sleep(1)

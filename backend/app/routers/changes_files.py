@@ -20,13 +20,13 @@ def get_logs():
     last_sync_time = request.args.get("last_sync_time") 
 
     if not code:
-        return jsonify({"msg": "code is required"}), 400
+        return jsonify({'msg': 'code is required'}), 400
 
     if last_sync_time:
         try:
             last_sync_time = datetime.fromisoformat(last_sync_time)
         except ValueError:
-            return jsonify({"msg": "Format date invalid. Use ISO format (YYYY-MM-DDTHH:MM:SS)"}), 400
+            return jsonify({'msg': 'Format date invalid. Use ISO format (YYYY-MM-DDTHH:MM:SS)'}), 400
 
     try:
         if last_sync_time:
@@ -38,4 +38,4 @@ def get_logs():
         return jsonify(logs_dict), 200
 
     except Exception as e:
-        return jsonify({"msg": str(e)}), 500
+        return jsonify({'msg': str(e)}), 500

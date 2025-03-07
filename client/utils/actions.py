@@ -16,14 +16,17 @@ BASE_DIR = get_config('default_folder')
 def done(filename:str,message:Api.Message) -> bool:
     '''This function is responsible verify if the file exists and 
     if was created in size of the client or verify if it sent to the server'''
+
+    logging.info(f'FILE EVENT :: {message}')
     
     if not os.path.exists(filename):
         return created(filename, message)
     
+    
     elif os.path.isfile(filename):
         hash_local = Api.generate_file_hash(filename)
         if hash_local == message.get('hash'):
-            logging.info(f'File without modified {message.get("name")}')
+            logging.info(f'FILE WITHOUT MODIFIED: {message.get("name")}')
             return True
         #TODO: MODIFY FOR DELTA FUNCTION
         return created(filename,message)

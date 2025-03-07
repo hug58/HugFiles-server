@@ -3,12 +3,14 @@ from bson import ObjectId
 from .base_model import BaseModel
 
 class FileLog(BaseModel):
-    def __init__(self, code, id_file, filename, action, timestamp=None):
+    def __init__(self, code, id_file, filename, action, file_hash, timestamp=None, modified_at=None):
         self.code = code  # code the account
         self.filename = filename  
         self.action = action  # action done: "added", "modified", "deleted"
         self.timestamp = timestamp or datetime.now()
         self.id_file = id_file  
+        self.file_hash = file_hash
+        self.modified_at = modified_at
 
     @staticmethod
     def from_dict(data):
@@ -17,7 +19,9 @@ class FileLog(BaseModel):
             filename=data.get('filename'),
             action=data.get('action'),
             timestamp=data.get('timestamp'),
+            modified_at=data.get('modified_at'),
             id_file= data.get('id_file'),
+            file_hash= data.get('file_hash'),
         )
 
     def to_dict(self):
@@ -26,8 +30,11 @@ class FileLog(BaseModel):
             'filename': self.filename,
             'action': self.action,
             'timestamp': self.timestamp,
-            'id_file': self.id_file
+            'modified_at': self.modified_at,
+            'id_file': str(self.id_file),
+            'file_hash': self.file_hash
         }
+        
 
     @classmethod
     def find_by_code(cls, code):

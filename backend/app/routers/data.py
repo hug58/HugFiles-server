@@ -35,16 +35,16 @@ def data(filename):
         file.save(full_path)
         
         
-        # if request.form.get('modified_at'):
-        #     atime = request.form.get('created_at')
-        #     mtime = request.form.get('modified_at')
-        #     os.utime(full_path, (atime, mtime))
+        if request.form.get('modified_at'):
+            atime = request.form.get('created_at')
+            mtime = request.form.get('modified_at')
+            os.utime(full_path, (atime, mtime))
         
 
         return jsonify({'msg': 'save uploaded file' })
 
     elif request.method == 'PUT':
-        ''' moves uploaded file to the specified location '''
+        ''' moves uploaded file to the specified location. '''
         if os.path.exists(filename):
             new_path = request.args.get('new_path')
             pass

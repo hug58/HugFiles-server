@@ -87,8 +87,8 @@ def info_file(filename: str, code:str, status=None) -> dict:
     _file = {
         'name': path.name,
 		'path': str(diff),
-		'created_at': round(os.path.getatime(filename)),
-		'modified_at': round(os.path.getmtime(filename)),
+		'created_at': os.path.getatime(filename),
+		'modified_at': os.path.getmtime(filename),
 		'size': os.path.getsize(filename),
 		'status': 'done' if status is None else status,
 		'type': 'file' if os.path.isfile(filename) else 'dir',

@@ -16,19 +16,17 @@ class Status(Enum):
 
 class FilesModel(BaseModel):
     def __init__(self, name, 
-                creation_date, 
+                created_at, 
                 path, 
-                modification_date, 
-                size, 
+                modified_at, 
                 file_hash, 
                 code,
                 status=Status.EVENT_TYPE_CREATED.value):
         
         self.name = name
-        self.creation_date = creation_date
+        self.created_at = created_at
         self.path = path
-        self.modification_date = modification_date
-        self.size = size
+        self.modified_at = modified_at
         self.file_hash = file_hash
         self.code = code
         self.status = status
@@ -38,10 +36,9 @@ class FilesModel(BaseModel):
     def from_dict(data):
         return FilesModel(
             name=data.get('name'),
-            creation_date=data.get('creation_date'),
+            created_at=data.get('created_at'),
             path=data.get('path'),
-            modification_date=data.get('modification_date'),
-            size=data.get('size'),
+            modified_at=data.get('modified_at'),
             file_hash=data.get('file_hash'),
             code=data.get('code'),
             status= Status(data.get('status')).value
@@ -51,10 +48,9 @@ class FilesModel(BaseModel):
     def to_dict(self):
         return {
             'name': self.name,
-            'creation_date': self.creation_date,
+            'created_at': self.created_at,
             'path': self.path,
-            'modification_date': self.modification_date,
-            'size': self.size,
+            'modified_at': self.modified_at,
             'file_hash': self.file_hash,
             'code': self.code,
             'status': self.status

@@ -48,3 +48,12 @@ def set_hash_file(filename: str, path: str, hash: str):
         json.dump(data, f, indent=4)
     
 
+def set_last_time(datetime:str, config_path:str='config.json'):
+    data = None
+    with open(config_path) as f:
+        data = json.load(f)
+        
+    with open(config_path,'w') as f:
+        data['last_time'] = datetime
+        json.dump(data, f)
+    

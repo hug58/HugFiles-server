@@ -2,12 +2,15 @@
 import re
 import requests
 import os
+import logging
 from utils import get_config
 from pathlib import Path
 
 from watchdog import events
 from datetime import datetime, timedelta
 from urllib.parse import urljoin
+
+from utils.api import Api
 
 class EventHandler(events.FileSystemEventHandler):
     '''
@@ -32,8 +35,12 @@ class EventHandler(events.FileSystemEventHandler):
         relative_path = os.path.relpath(event.src_path,self.path)
         relative_path = str(Path(relative_path).parent)
         
+        
         self.message = {
 			'status': event.event_type,
-			'path': event.src_path,
+			'path': relative_pathh,
 			'name': result.group(2),
+            'hash': Api.generate_file_hash(event.src_path)
 		}
+        
+        logging.info(f'FILE EVENT IN POLLING OBSERVER: {self.message}')

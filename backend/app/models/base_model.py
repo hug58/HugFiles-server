@@ -23,13 +23,9 @@ class BaseModel:
     def save(self):
         '''Save the model to the database'''
         collection = self.__class__.get_collection()  
-        print(f"COLLECTIO FROM: {self.__class__.__name__}")
         data = self.to_dict()  
         result = collection.insert_one(data)
-        print(f'ID RESULT: {result.inserted_id}')
         self._id = result.inserted_id
-        
-        print(f"ID: {self._id}")
         return self._id
 
     @classmethod
@@ -44,8 +40,10 @@ class BaseModel:
     @classmethod
     def update(cls, id, update_data):
         '''Update the model with the new data'''
+        _id =  ObjectId(id) if isinstance(id, str) else id
+        print(f'UPDATE ID: {_id} :: {update_data}')
         result = cls.get_collection().update_one(
-            {"_id": ObjectId(id)},
+            {"_id": _id},
             {"$set": update_data}
         )
         return result.modified_count > 0

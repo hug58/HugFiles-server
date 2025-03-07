@@ -11,7 +11,7 @@ from urllib.parse import urljoin
 from datetime import datetime
 
 
-from utils import get_config, set_hash_file
+from utils import get_config, set_hash_file, set_last_time
 
 
 
@@ -156,18 +156,25 @@ class Api:
         
         
         if cls.last_datetime:
-            response = requests.get(get_config('url_logs'), timeout=100)
+            #last synchronization
+            logging.info(f'LAST SYNCHRONIZATION: {cls.last_datetime}')
+            
+            response = requests.get(get_config('url_logs') + f'?last_sync_time={formatted_date}', timeout=100)
             if response.status_code == 200:
                 logs = response.json()
                 for log in logs:
                     logging.info("LOG: %s" % str(log))
+                    
+            
+            set_last_time(formatted_date)
+            return True
             
         
         response = requests.get(get_config('url_files') + f'?code={cls.code}', timeout=100)
         
         if response.status_code == 200:
             files = response.json().get('files')
-            logging.info(f'FILE SYNCHRONIZATION START: {files}')
+            logging.info(f'FILE SYNCHRONIZATION START')
             
             for file in files:
                 logging.info("FILE: %s" % str(file))
@@ -175,3 +182,5 @@ class Api:
         
         
         
+        set_last_time(formatted_date)
+        return False
