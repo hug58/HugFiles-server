@@ -12,16 +12,23 @@ class Status(Enum):
     EVENT_TYPE_MODIFIED = "modified"
     EVENT_TYPE_CLOSED = "closed"
     EVENT_TYPE_OPENED = "opened"
+    EVENT_TYPE_DONE = "done"
+    
  
 
 class FilesModel(BaseModel):
+    
+    format_str = '%Y-%m-%dT%H:%M:%S'
+    
     def __init__(self, name, 
                 created_at, 
                 path, 
                 modified_at, 
                 file_hash, 
                 code,
-                status=Status.EVENT_TYPE_CREATED.value):
+                status=Status.EVENT_TYPE_CREATED.value,
+                timestamp= None
+                ):
         
         self.name = name
         self.created_at = created_at
@@ -30,6 +37,7 @@ class FilesModel(BaseModel):
         self.file_hash = file_hash
         self.code = code
         self.status = status
+        self.timestamp = timestamp
 
 
     @staticmethod
@@ -41,7 +49,8 @@ class FilesModel(BaseModel):
             modified_at=data.get('modified_at'),
             file_hash=data.get('file_hash'),
             code=data.get('code'),
-            status= Status(data.get('status')).value
+            status= Status(data.get('status')).value,
+            timestamp= data.get('timestamp')
         )
 
 
@@ -53,7 +62,8 @@ class FilesModel(BaseModel):
             'modified_at': self.modified_at,
             'file_hash': self.file_hash,
             'code': self.code,
-            'status': self.status
+            'status': self.status,
+            'timestamp': self.timestamp
         }
         
         
@@ -88,24 +98,41 @@ class FilesModel(BaseModel):
     def find_by_code_and_status(
         cls, 
         code: str, 
-        exclude_status: Optional[str] = None
+        exclude_status: Optional[str] = None,
+        min_timestamp: Optional[datetime] = None
     ) -> List['FilesModel']:
         '''
-        Searches for all files of a `code` and excludes those with the `exclude_status`.
+        Searches for all files of a `code`, excludes those with the `exclude_status`,
+        and filters by a minimum timestamp (if provided).
         
         :param code: The code of the file.
         :param exclude_status: The status to exclude (optional).
+        :param min_timestamp: The minimum timestamp to filter by (optional).
         :return: A list of `FilesModel` instances matching the criteria.
         '''
 
         query = {"code": code}
+        
+        # Exclude files with the specified status
         if exclude_status is not None:
             query["status"] = {"$ne": exclude_status}  
+        
+        # Filter by minimum timestamp
+        if min_timestamp is not None:
+            query["timestamp"] = {"$gte": min_timestamp}
 
+        # Execute the query
         documents = cls.get_collection().find(query)
+        
+        # Convert documents to FilesModel instances
         files = []
+        
+        print(f'DOCUMENTS: {documents}')
+        
         for document in documents:
-            document['_id'] = str(document['_id'])
+            document['_id'] = str(document['_id'])  # Convert ObjectId to string
+            # file_model = cls.from_dict(document) 
             files.append(document)
 
         return files
+    

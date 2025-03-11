@@ -5,6 +5,7 @@ import json
 import os
 
 from urllib.parse import urljoin
+from datetime import datetime
 from flask import  request, send_from_directory, jsonify
 
 from app.utils.files_read import get_files
@@ -21,7 +22,6 @@ app_data = Blueprint('data', __name__)
 def data(filename):
     path = pathlib.Path(filename)
     filename = urljoin(current_app.config['UPLOAD_FOLDER'], filename)
-
 
     if request.method == 'POST':
         if not os.path.isdir(filename):
@@ -76,15 +76,25 @@ def consult():
 @app_data.route('/files')
 def consult_files_db():
     code = request.args.get('code')
+    min_timestamp = request.args.get('min_timestamp')
     
     if not code:
         return jsonify({'msg': 'Parameter "code" is required'}), 400
+    
+    if min_timestamp:
+        try:
+            print(f'MIN TIMESTAMP  START ::  {min_timestamp}')
+            min_timestamp = datetime.strptime(min_timestamp, FilesModel.format_str)
+            print(f'MIN TIMESTAMP END ::  {min_timestamp}')
+        except ValueError as error:
+            return jsonify({'msg': error}), 400
+        
 
     try:
-        files = FilesModel.find_by_code_and_status(code=code, exclude_status='deleted')
+        files = FilesModel.find_by_code_and_status(code=code, exclude_status='deleted', min_timestamp=min_timestamp)
         return jsonify({'files': files}), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"msg": str(e)}), 500
 
 
 @app_data.route('/download', methods=['POST'])

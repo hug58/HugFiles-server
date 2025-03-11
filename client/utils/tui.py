@@ -41,6 +41,11 @@ class TerminalInterface:
         color = Fore.GREEN if self._connected else Fore.RED
         print(f'{color} Connection Status: {color}█{Fore.RESET}')
         
+    
+    @staticmethod
+    def on():
+        return Fore.BLUE
+        
     def loop(self):
         self.draw_connection_circle()
         

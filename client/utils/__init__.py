@@ -2,6 +2,7 @@
 from typing import Optional
 
 import json
+import logging
 import os
 
 def get_config(key:str=None, config_path:str='config.json') -> Optional[dict]:
@@ -12,6 +13,7 @@ def get_config(key:str=None, config_path:str='config.json') -> Optional[dict]:
             os.makedirs(data['default_folder'])
 
         return data.get(key) if key else data
+
 
 
 def set_folder(path:str) -> None:
@@ -57,3 +59,24 @@ def set_last_time(datetime:str, config_path:str='config.json'):
         data['last_time'] = datetime
         json.dump(data, f)
     
+
+def delete_file_from_config(filename: str, path: str, config_path:str='config.json'):
+    try:
+        with open(config_path, 'r') as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        logging.info(f'FILE {config_path} NOT FOUND')
+        return
+
+    logging.info(f'DELETING :: FILENAME: {filename} :: PATH: {path}')
+    files = data['files']
+    updated_files = [file for file in files if not (file['filename'] == filename and file['path'] == path)]
+
+    if len(updated_files) == len(files):
+        logging.info(f'FILE {filename} and {path} NOT FOUND')
+    else:
+        data['files'] = updated_files
+        with open(config_path, 'w') as f:
+            json.dump(data, f, indent=4)
+        logging.info(f'FILE {filename} AND THE PATH: {path} HAS BEEN DELETED')
+        

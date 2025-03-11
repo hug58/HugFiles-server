@@ -1,12 +1,15 @@
 """docstring"""
 
 import os
+import sys
 import logging
 import asyncio
 import json
 import socketio
 
 from watchdog.observers.polling import PollingObserver
+from watchdog.observers import Observer
+
 
 from utils import event_handler  
 from utils import actions
@@ -25,15 +28,16 @@ async def on_notify(data):
     '''get all files from server'''
     
     message: Api.Message = json.loads(data)
-
-    if message.get('status'):
+    status = message.get('status') 
+    if status:
         filename = os.path.join(DEFAULT_FOLDER, message['path'], message['name']) if message['path'] != '/' else os.path.join(DEFAULT_FOLDER, message['name'])
             
         if (message['status'] == 'created' 
             or message['status'] == 'done'
             or message['status'] == 'modified'
+            or message['status'] == 'opened'
         ):
-            actions.done(filename,message)
+            actions.done(filename, message)
 
         elif message['status'] == 'delete':
             actions.deleted(filename)
@@ -44,7 +48,7 @@ async def on_notify(data):
 @sio.event
 async def connect():
     Api.check_last_time()
-    print("Conectado al servidor")
+    print(f'CONNECTED TO SERVER: {TerminalInterface.on()}  []')
 
 
 async def producer_file(message):
@@ -62,19 +66,9 @@ async def producer_handler(path, code):
     observer.schedule(monitorsystem, path=path, recursive=True)
     observer.start()
     try:
-        print('Loading Monitorsystem')
-        
         while True:
             if monitorsystem.message != {}:
-                
-                for file in get_config('files'):
-                    file:dict 
-                    if (
-                        file.get('name') == monitorsystem.message.get('name') and
-                        file.get('path') == monitorsystem.message.get('path') and
-                        file.get('hash') != monitorsystem.message.get('hash')):
-                
-                        await producer_file(monitorsystem.message)
+                await producer_file(monitorsystem.message)
                 monitorsystem.message = {}
                 
             else:
@@ -83,6 +77,7 @@ async def producer_handler(path, code):
         observer.stop()
 
     observer.join()
+
 
 async def main():
     global DEFAULT_FOLDER
@@ -107,5 +102,8 @@ async def main():
 
 
 if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+    try:
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(main())
+    except asyncio.exceptions.CancelledError as e:
+        sys.exit(1)

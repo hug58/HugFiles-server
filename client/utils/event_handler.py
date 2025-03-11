@@ -26,6 +26,8 @@ class EventHandler(events.FileSystemEventHandler):
         self.path = path
         
     def on_any_event(self, event):
+        logging.info(f'FILE EVENT IN POLLING OBSERVER: {event}')
+        
         result = re.search(self.pattern, event.src_path)
         if datetime.now() - self.last_modified < timedelta(seconds=1):
             return
@@ -33,14 +35,34 @@ class EventHandler(events.FileSystemEventHandler):
             self.last_modified = datetime.now()
             
         relative_path = os.path.relpath(event.src_path,self.path)
-        relative_path = str(Path(relative_path).parent)
+        hash_file = Api.generate_file_hash(event.src_path)
+        file_db = Api.local_files.get(relative_path)
         
+            
+        if isinstance(file_db,dict) and file_db.get('hash') != hash_file:
+            logging.info(f'DIFERENT HASH :: DATABASE LOCAL: {_hash} :: FILE: {hash_file}')
+            self.message = {
+                        'status': event.event_type,
+                        'path': str(Path(relative_path).parent),
+                        'path_local': event.src_path,
+                        'name': result.group(2),
+                    }
+        elif isinstance(file_db,dict):
+            logging.info(f'MATCH HASH :: DATABASE LOCAL: {file_db.get("hash")} :: FILE: {hash_file}')
         
-        self.message = {
-			'status': event.event_type,
-			'path': relative_pathh,
-			'name': result.group(2),
-            'hash': Api.generate_file_hash(event.src_path)
-		}
+        else:
+            logging.info(f'PATH: {relative_path}')
+
+
+    def on_deleted(self, event:events.FileSystemEvent):
+        '''Catch deleted events'''
+        self.message = {}
         
-        logging.info(f'FILE EVENT IN POLLING OBSERVER: {self.message}')
+        relative_path = os.path.relpath(event.src_path,self.path)
+        relative_path = str(relative_path)
+        
+        self.message = [{
+            'name': path.name,
+            'status': event.event_type,
+            'filename': relative_path
+        }]

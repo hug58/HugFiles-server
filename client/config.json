@@ -9,9 +9,15 @@
     "user": "hugo@test.com",
     "files": [
         {
-            "filename": "cv_hugo_h_montanez.pdf",
-            "path": "data/cv_hugo_h_montanez.pdf",
-            "hash": "56b6a96c67cb9e54024388f5c9bdc4ebd188a0eec4d0d95ce3f63f21e0f4dee4"
+            "filename": "hugo_montanez_en.pdf",
+            "path": "data/hugo_montanez_en.pdf",
+            "hash": "26585295e4966e295e169aec904051c4cb06f9c9f59a2982d01425afb38f3a79"
+        },
+        {
+            "filename": "cv_hugo_montanez_english.doc",
+            "path": "data/cv_hugo_montanez_english.doc",
+            "hash": "5e3ddeee48260e138cda32626af22005980fd58a59130faa07d25027709cb5aa"
         }
-    ]
+    ],
+    "last_time": "2025-03-10T20:43:32"
 }

@@ -22,7 +22,6 @@ def monitor_folder(path):
             observer.start()
             while True:
                 if monitorsystem.message:
-                    print(f'monitoring: {monitorsystem.message}')
                     message = monitorsystem.message
                     for file in message:
                         file: dict
@@ -36,7 +35,7 @@ def monitor_folder(path):
                             'status': file.get('status'),
                             'type': file.get('type') if file.get('type') else '',
                             'code': file.get('code'),
-                            'hash': file.get('hash')
+                            'file_hash': file.get('hash')
                         })
 
                     monitorsystem.message = {}
