@@ -24,7 +24,17 @@ def set_folder(path:str) -> None:
     with open('config.json','w') as f:
         data['default_folder'] = path
         json.dump(data, f)
-      
+
+
+def set_email(username:str) -> None:
+    data = None
+    with open('config.json') as f:
+        data = json.load(f)
+        
+    with open('config.json','w') as f:
+        data['user'] = username
+        json.dump(data, f)
+
   
 def set_hash_file(filename: str, path: str, hash: str):
     try:
@@ -65,7 +75,7 @@ def delete_file_from_config(filename: str, path: str, config_path:str='config.js
         with open(config_path, 'r') as f:
             data = json.load(f)
     except FileNotFoundError:
-        logging.info(f'FILE {config_path} NOT FOUND')
+        logging.error(f'FILE {config_path} NOT FOUND')
         return
 
     logging.info(f'DELETING :: FILENAME: {filename} :: PATH: {path}')

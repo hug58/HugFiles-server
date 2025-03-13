@@ -6,18 +6,5 @@
     "url_logs": "http://127.0.0.1:80/logs/files",
     "url_files": "http://127.0.0.1:80/data/files",
     "default_folder": "data",
-    "user": "hugo@test.com",
-    "files": [
-        {
-            "filename": "hugo_montanez_en.pdf",
-            "path": "data/hugo_montanez_en.pdf",
-            "hash": "26585295e4966e295e169aec904051c4cb06f9c9f59a2982d01425afb38f3a79"
-        },
-        {
-            "filename": "cv_hugo_montanez_english.doc",
-            "path": "data/cv_hugo_montanez_english.doc",
-            "hash": "5e3ddeee48260e138cda32626af22005980fd58a59130faa07d25027709cb5aa"
-        }
-    ],
-    "last_time": "2025-03-10T20:43:32"
+    "files": []
 }

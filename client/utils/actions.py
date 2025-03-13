@@ -50,14 +50,18 @@ def created(filename:str, message: Api.Message) -> bool:
 
 def deleted(filename: str):
     logging.info(f'START DELETE:: {filename}')
-    if os.path.exists(filename):
-        if os.path.isfile(filename):
-            delete_file_from_config(pathlib.Path(filename).name,filename)
-            os.remove(filename)
-            return True
+    try:
+        if os.path.exists(filename):
+            if os.path.isfile(filename):
+                delete_file_from_config(pathlib.Path(filename).name,filename)
+                os.remove(filename)
+                Api.load_files()
+                return True
 
-        os.rmdir(filename)    
-        return True
-    return False
+            os.rmdir(filename)    
+            return True
+        return False
+    except Exception as e:
+        logging.error(f'EXCEPTION IN DELETE: {e}')
 
 

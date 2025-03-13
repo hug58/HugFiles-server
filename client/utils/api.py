@@ -67,9 +67,7 @@ class Api:
         for file in get_config('files'):
             _key = file.get('path')
             cls.local_files[_key] = file
-            
         logging.info(f'LOADED FILES: {cls.local_files}')
-
 
 
     @staticmethod

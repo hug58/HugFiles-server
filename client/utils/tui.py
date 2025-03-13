@@ -1,7 +1,7 @@
 import os
 from colorama import init, Fore
 
-from utils import get_config
+from utils import get_config, set_email, set_folder
 from .api import Api
 
 class TerminalInterface:
@@ -12,30 +12,35 @@ class TerminalInterface:
         self._code = None
         init()
 
+
     def submit_email(self):
         ''' get email if config not available. '''
         color = Fore.RED
         
-        while True:
+        while self._email is None:
             email = input('Input email: ')
             if email and  len(email) > 0 :
                 self._email = email
+                set_email(self._email)
                 break
             print(f'{color}Please select a valid email {color}█{Fore.RESET}')
 
     def select_folder(self):
         color = Fore.RED
-        while True:
+        while self._path is None:
             folder_path = input('Select Directory: ')
             if os.path.exists(folder_path) and os.path.isdir(folder_path):
                 self._path = folder_path
+                set_folder(self._path)
                 break
             
             print(f'{color}Please select a folder that exists {color}█{Fore.RESET}')
         
+        
     def toggle_connection(self):
         self._connected = not self._connected
         self.draw_connection_circle()
+
 
     def draw_connection_circle(self):
         color = Fore.GREEN if self._connected else Fore.RED
@@ -46,10 +51,13 @@ class TerminalInterface:
     def on():
         return Fore.BLUE
         
+        
     def loop(self):
         self.draw_connection_circle()
         
-        while not self._email and not self._path:
+        
+        while not self._email or not self._path:
+            
             self.select_folder()
             self.submit_email()
             
@@ -67,9 +75,11 @@ class TerminalInterface:
     def email(self):
         return self._email
     
+    
     @property
     def path(self):
         return self._path
+    
     
     @property
     def code(self):

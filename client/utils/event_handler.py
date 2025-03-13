@@ -38,20 +38,19 @@ class EventHandler(events.FileSystemEventHandler):
         hash_file = Api.generate_file_hash(event.src_path)
         file_db = Api.local_files.get(relative_path)
         
-            
-        if isinstance(file_db,dict) and file_db.get('hash') != hash_file:
-            logging.info(f'DIFERENT HASH :: DATABASE LOCAL: {_hash} :: FILE: {hash_file}')
-            self.message = {
-                        'status': event.event_type,
-                        'path': str(Path(relative_path).parent),
-                        'path_local': event.src_path,
-                        'name': result.group(2),
-                    }
-        elif isinstance(file_db,dict):
+        if isinstance(file_db,dict) and file_db.get('hash') == hash_file:
             logging.info(f'MATCH HASH :: DATABASE LOCAL: {file_db.get("hash")} :: FILE: {hash_file}')
+            return None
         
-        else:
-            logging.info(f'PATH: {relative_path}')
+            
+        logging.info(f'DIFERENT HASH :: DATABASE LOCAL: {_hash} :: FILE: {hash_file}')
+        self.message = {
+            'status': event.event_type,
+            'path': str(Path(relative_path).parent),
+            'path_local': event.src_path,
+            'name': result.group(2)
+        }
+        
 
 
     def on_deleted(self, event:events.FileSystemEvent):
