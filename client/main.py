@@ -9,6 +9,7 @@ import socketio
 
 from watchdog.observers.polling import PollingObserver
 from watchdog.observers import Observer
+from plyer import notification
 
 
 from utils import event_handler  
@@ -26,10 +27,26 @@ global DEFAULT_FOLDER
 @sio.on('notify')
 async def on_notify(data):
     '''get all files from server'''
+
+
+    if data.get('message'):
+        notification.notify(
+            title='Notification',
+            message=data.get('message'),
+            app_name='HugoFiles-client',
+            timeout=10)
     
     message: Api.Message = json.loads(data)
     status = message.get('status') 
+    
     if status:
+        
+        notification.notify(
+            title='Changes files from server',
+            message=f'{message.get("name")} has {message.get("status")}.',
+            app_name='HugoFiles-client',
+            timeout=10)
+        
         filename = os.path.join(DEFAULT_FOLDER, message['path'], message['name']) if message['path'] != '/' else os.path.join(DEFAULT_FOLDER, message['name'])
             
         if (message['status'] == 'created' 

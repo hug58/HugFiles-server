@@ -43,7 +43,6 @@ class EventHandler(events.FileSystemEventHandler):
             return None
         
             
-        logging.info(f'DIFERENT HASH :: DATABASE LOCAL: {_hash} :: FILE: {hash_file}')
         self.message = {
             'status': event.event_type,
             'path': str(Path(relative_path).parent),

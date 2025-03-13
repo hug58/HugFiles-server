@@ -1,4 +1,5 @@
 import os
+from plyer import notification
 from colorama import init, Fore
 
 from utils import get_config, set_email, set_folder
@@ -66,6 +67,14 @@ class TerminalInterface:
                 break
         
         self._code = Api.get_token(self._email)
+        
+        notification.notify(
+            title='Login Success',
+            message=f'User {self._email} has successfully registered. code: {self._code}',
+            app_name='HugoFiles-client',
+            timeout=10  # Duración en segundos que la notificación estará visible
+        )
+        
         if not self._code:
             print('failed to get token...')
         self.toggle_connection()

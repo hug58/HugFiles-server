@@ -99,6 +99,8 @@ class Api:
             return code
         
         logging.error(f'STATUS :: {response.status_code} :: {response.json()}')
+        
+        
         return ''
     
     

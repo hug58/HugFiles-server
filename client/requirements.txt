@@ -11,8 +11,7 @@ frozenlist==1.5.0
 h11==0.14.0
 idna==2.9
 idna-ssl==1.1.0
-multidict==4.7.6
-pathtools==0.1.2
+# multidict==4.7.6
 propcache==0.2.0
 python-engineio==4.11.2
 python-socketio==5.10.0
@@ -20,8 +19,9 @@ requests==2.23.0
 simple-websocket==1.1.0
 six==1.15.0
 typing-extensions==3.7.4.2
-urllib3==1.25.9
-watchdog==0.10.2
+urllib3==1.25.1
+watchdog==6.0.0
 websockets==9.1
 wsproto==1.2.0
 yarl==1.15.2
+plyer==2.1.0
