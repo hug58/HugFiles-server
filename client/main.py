@@ -28,15 +28,15 @@ global DEFAULT_FOLDER
 async def on_notify(data):
     '''get all files from server'''
 
+    message: Api.Message = json.loads(data)
 
-    if data.get('message'):
+    if message.get('message'):
         notification.notify(
             title='Notification',
-            message=data.get('message'),
+            message=message.get('message'),
             app_name='HugoFiles-client',
             timeout=10)
     
-    message: Api.Message = json.loads(data)
     status = message.get('status') 
     
     if status:
@@ -121,6 +121,10 @@ async def main():
 if __name__ == '__main__':
     try:
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(main())
-    except asyncio.exceptions.CancelledError as e:
-        sys.exit(1)
+    except RuntimeError as e:
+        if str(e).startswith("There is no current event loop"):
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        else:
+            raise
+    loop.run_until_complete(main())
